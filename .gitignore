@@ -55,6 +55,7 @@ context.md
 # Translations
 *.mo
 *.pot
+tests/
 
 # Django stuff:
 *.log
