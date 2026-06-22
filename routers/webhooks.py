@@ -1,7 +1,7 @@
 from fastapi import APIRouter, BackgroundTasks
 from fastapi.responses import JSONResponse
 from utils.loggings import get_logger
-from models import FormSubmission, EmailSubmission
+from models.requests import FormSubmission, EmailSubmission
 
 
 
