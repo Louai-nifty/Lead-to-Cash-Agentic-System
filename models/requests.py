@@ -2,13 +2,20 @@ from typing import List, Optional
 from pydantic import BaseModel, Field, EmailStr
 
 
-class FormSubmission(BaseModel):
-    name: str = Field(..., min_length=1, description="Name of the lead, required field")
-    email: EmailStr = Field (..., description="Email of the lead, required field")
-    phone_number: Optional[str] = Field(None, description="Phone number is optional")
-    company_name: str = Field(..., min_length=1, description="Company name of the lead, required field")
-    job_title: str = Field(..., min_length=1, description="Job title of the lead, required field")
-    message: str = Field(..., min_length=1, description="Message from the lead, can include specific requirements or questions")
+class TallyFields(BaseModel):
+    key: str
+    label: str
+    type: str
+    value: str
+
+class TallyData(BaseModel):
+    formName: str
+    createdAt: str
+    submissionPdfUrl: str
+    fields: List[TallyFields] # The hierarchy comes here, it's when you pass the nested level model
+    
+class WebhookPayload(BaseModel):
+    data: TallyData # The hierarchy comes here, it's when you pass the nested level model
 
 
 class EmailSubmission(BaseModel):

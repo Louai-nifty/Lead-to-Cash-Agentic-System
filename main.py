@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import webhooks, triggers
+from routers import webhooks
 
 
 app = FastAPI(
@@ -10,7 +10,6 @@ app = FastAPI(
 
 
 app.include_router(webhooks.router)
-app.include_router(triggers.router)
 
 
 @app.get("/health")
