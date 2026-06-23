@@ -14,7 +14,7 @@ class TallyData(BaseModel):
     submissionPdfUrl: str
     fields: List[TallyFields] # The hierarchy comes here, it's when you pass the nested level model
     
-class WebhookPayload(BaseModel):
+class TallySubmission(BaseModel):
     data: TallyData # The hierarchy comes here, it's when you pass the nested level model
 
 
