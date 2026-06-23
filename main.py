@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from routers import webhooks
+from routers.triggers import scheduler
 
 
 app = FastAPI(
@@ -16,6 +17,15 @@ app.include_router(webhooks.router)
 def health_check():
     return {"status": "ok", "service": "Lead-to-Cash API"}
 
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+    
+    
+
+
+@app.on_event("startup")
+async def start_scheduler():
+    scheduler.start()
