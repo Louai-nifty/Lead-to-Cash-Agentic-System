@@ -203,6 +203,8 @@ async def poll_gmail():
                     sup_client.table("Leads").insert(lead_data).execute()
                 else:
                     sup_client.table("Leads").update({"Status":"old"}).eq("email", lead_data['email']).execute()
+                    
+                # The invocation of the agent    
                 cash_agent.invoke({
                     "lead_email": lead_data['email'],
                     "lead_domain": lead_data['domain']
