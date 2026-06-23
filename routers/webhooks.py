@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 
-# Background task functions
+# Background task functions for the for submission
 async def process_form_submission(payload: TallySubmission) -> None:
     """
     Background task to process form submission.

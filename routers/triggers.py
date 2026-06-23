@@ -175,7 +175,7 @@ def extract_email_body(msg) -> str:
     return body if body else "No content"
 
 
-@scheduler.scheduled_job('interval', minutes=4)
+@scheduler.scheduled_job('interval', minutes=5)
 async def poll_gmail():
     """
     Scheduler job that runs every 4 minutes to poll Gmail for new emails.
