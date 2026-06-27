@@ -1,5 +1,5 @@
 from tools.enrich import enrichment_tool
-from state import AgentState
+from agent.state import AgentState
 from database.db import get_client
 from utils.loggings import get_logger
 

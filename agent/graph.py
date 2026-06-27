@@ -1,8 +1,8 @@
 from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
-from state import AgentState
-from nodes.enrichment_node import enrichment_node
-from checkpointer import get_checkpointer
+from .state import AgentState
+from .nodes.enrichment_node import enrichment_node
+from .checkpointer import get_checkpointer
 
 cash_agent = StateGraph(AgentState)
 
