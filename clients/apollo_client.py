@@ -5,7 +5,10 @@ import asyncio
 class ApolloClient:
     def __init__(self):
         self.base_url = "https://api.apollo.io/api/v1/"
-        self.headers = {"Authorization": f"Bearer {APOLLO_API_KEY}"}
+        self.headers = {"Authorization": f"Bearer {APOLLO_API_KEY}",
+                        "Cache-Control": "no-cache",
+                        "Content-Type": "application/json",
+                        "accept": "application/json"}
         self.timeout = 30
         self.max_retries = 3
     
