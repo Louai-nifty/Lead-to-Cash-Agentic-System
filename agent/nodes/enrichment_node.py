@@ -28,6 +28,7 @@ async def enrichment_node(state: AgentState):
         
         state.enriched_data = company_info
         return state
+    
     except Exception as e:
         logger.error(f"Enrichment failed for {email}: {str(e)}")
         state.status = "failed"

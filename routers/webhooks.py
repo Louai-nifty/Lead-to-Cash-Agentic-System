@@ -6,11 +6,8 @@ import json
 from database.db import get_client
 from agent.graph import cash_agent
 
-
 sup_client = get_client()
-
 logger = get_logger(__name__)
-
 router = APIRouter()
 
 
