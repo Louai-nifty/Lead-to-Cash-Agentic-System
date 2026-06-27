@@ -13,7 +13,7 @@ async def enrichment_node(state: AgentState):
         email = state.lead_email
         
         logger.info(f"Enrich lead: {email}")
-        enrichment_result = enrichment_tool(domain)
+        enrichment_result = await enrichment_tool(domain)
         
         company_info = {
             "industry": enrichment_result.organization.industry,
@@ -22,7 +22,7 @@ async def enrichment_node(state: AgentState):
             "location" : enrichment_result.organization.city
         }
         
-        sup_client.table("Leads").update(company_info).eq("email", email).execute()
+        await sup_client.table("Leads").update(company_info).eq("email", email).execute()
         
         logger.info("Lead Enrichment Completed")
         

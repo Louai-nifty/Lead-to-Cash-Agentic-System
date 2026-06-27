@@ -10,6 +10,6 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-def get_client():
+async def get_client():
     """Return Supabase client (reuse same connection)."""
     return client
