@@ -1,10 +1,10 @@
 import httpx
-from config import HUNTER_API_KEY
+from config import Hunter_API_Key
 
 class HunterClient:
     def __init__(self):
         self.base_url = "https://api.hunter.io/v2"
-        self.api_key = HUNTER_API_KEY
+        self.api_key = Hunter_API_Key
         self.timeout = 30
     
     async def enrich_organization(self, domain: str) -> dict:
