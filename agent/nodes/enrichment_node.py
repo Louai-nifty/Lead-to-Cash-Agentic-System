@@ -16,10 +16,10 @@ async def enrichment_node(state: AgentState):
         enrichment_result = await enrichment_tool.ainvoke({"lead_domain": domain})
         
         company_info = {
-            "industry": enrichment_result.data.category.industry,
-            "size": enrichment_result.data.metrics.employees,
-            "revenue": enrichment_result.data.metrics.annualRevenue,
-            "location" : enrichment_result.data.geo.city
+            "industry": enrichment_result["data"]["category"]["industry"],
+            "size": enrichment_result["data"]["metrics"]["employees"],
+            "revenue": enrichment_result["data"]["metrics"]["annualRevenue"],
+            "location" : enrichment_result["data"]["geo"]["city"]
         }
         
         sup_client.table("Leads").update(company_info).eq("email", email).execute()

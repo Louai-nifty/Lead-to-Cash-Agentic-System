@@ -53,8 +53,6 @@ async def process_form_submission(payload: TallySubmission) -> None:
             "lead_email": lead_data['email'],
             "lead_domain": domain
         })
-        
-        logger.info(f"Form submission processed successfully: {payload} ({payload})")
     except Exception as e:
         logger.error(f"Error processing form submission: {str(e)}", exc_info=True)
 
