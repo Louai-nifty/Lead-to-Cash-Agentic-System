@@ -39,17 +39,17 @@ async def process_form_submission(payload: TallySubmission) -> None:
         
         lead_email = lead_data.get("email")
         domain = lead_email.split("@")[1]
-        response = await sup_client.table("Leads").select("*", count="exact").eq("email", lead_email).execute()
+        response = sup_client.table("Leads").select("*", count="exact").eq("email", lead_email).execute()
         count = response.count
         if count == 0:
             lead_data['Status'] = "new"
             lead_data['source'] = "tally_form"
             lead_data['form_sub_json'] = payload.model_dump()
-            await sup_client.table("Leads").insert(lead_data).execute()
+            sup_client.table("Leads").insert(lead_data).execute()
         else:
-            await sup_client.table("Leads").update({"Status":"old"}).eq("email", lead_email).execute()
+            sup_client.table("Leads").update({"Status":"old"}).eq("email", lead_email).execute()
         
-        cash_agent.invoke({
+        await cash_agent.ainvoke({
             "lead_email": lead_data['email'],
             "lead_domain": domain
         })

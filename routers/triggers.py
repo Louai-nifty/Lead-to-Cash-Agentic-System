@@ -10,7 +10,7 @@ from database.db import get_client
 from agent.graph import cash_agent
 from config import GMAIL_EMAIL, GMAIL_APP_PASSWORD, IMAP_SERVER, IMAP_PORT
 
-logger = get_logger()
+logger = get_logger(__name__)
 
 sup_client = get_client()
 scheduler = AsyncIOScheduler()
@@ -200,9 +200,9 @@ async def poll_gmail():
                 if count == 0:
                     lead_data['source'] = "email"
                     lead_data['Status'] = "new"
-                    await sup_client.table("Leads").insert(lead_data).execute()
+                    sup_client.table("Leads").insert(lead_data).execute()
                 else:
-                    await sup_client.table("Leads").update({"Status":"old"}).eq("email", lead_data['email']).execute()
+                    sup_client.table("Leads").update({"Status":"old"}).eq("email", lead_data['email']).execute()
                     
                 # The invocation of the agent    
                 cash_agent.invoke({

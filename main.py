@@ -25,7 +25,8 @@ if __name__ == "__main__":
     
     
 
-
+"""
 @app.on_event("startup")
 async def start_scheduler():
     scheduler.start()
+"""
