@@ -1,10 +1,10 @@
-from tools.enrich import enrichment_tool
+from agent.tools.enrich import enrichment_tool
 from agent.state import AgentState
 from database.db import get_client
 from utils.loggings import get_logger
 
 sup_client = get_client()
-logger = get_logger()
+logger = get_logger(__name__)
 
 async def enrichment_node(state: AgentState):
     "The node responsible for the enrichment stage"
@@ -13,16 +13,16 @@ async def enrichment_node(state: AgentState):
         email = state.lead_email
         
         logger.info(f"Enrich lead: {email}")
-        enrichment_result = await enrichment_tool(domain)
+        enrichment_result = await enrichment_tool.ainvoke({"lead_domain": domain})
         
         company_info = {
-            "industry": enrichment_result.organization.industry,
-            "size": enrichment_result.organization.estimated_num_employees,
-            "revenue": enrichment_result.organization.annual_revenue,
-            "location" : enrichment_result.organization.city
+            "industry": enrichment_result.data.category.industry,
+            "size": enrichment_result.data.metrics.employees,
+            "revenue": enrichment_result.data.metrics.annualRevenue,
+            "location" : enrichment_result.data.geo.city
         }
         
-        await sup_client.table("Leads").update(company_info).eq("email", email).execute()
+        sup_client.table("Leads").update(company_info).eq("email", email).execute()
         
         logger.info("Lead Enrichment Completed")
         
