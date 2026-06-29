@@ -6,3 +6,5 @@ class AgentState(BaseModel):
     lead_domain: str
     enriched_data: Optional[dict] = None
     status: Optional[str] = None
+    lead_score: Optional[int] = None
+    lead_priority: Optional[str] = None
