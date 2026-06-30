@@ -1,7 +1,6 @@
-import asyncio
 from typing import Any
 
-async def scoring_func(size: Any, industry: str, source: str):
+def scoring_func(size: Any, industry: str, source: str):
     try:
         primary_industry = ["Human Resources", "Real Estate"]
         secondary_industry = ["IT Services","Business Consulting"]
