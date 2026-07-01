@@ -1,0 +1,2 @@
+# this "assignment" node or phase, will have messages being sent, and HITL, also AI to do the estimated value of the deal
+# Estimated value of the deal, Assignment to reps, messages sent to reps or managers, HITL, database updated  
