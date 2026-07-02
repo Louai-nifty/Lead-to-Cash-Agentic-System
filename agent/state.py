@@ -8,3 +8,6 @@ class AgentState(BaseModel):
     status: Optional[str] = None
     lead_score: Optional[int] = None
     lead_priority: Optional[str] = None
+    rep_email : Optional[EmailStr] = None
+    assigned_to: Optional[str] = None
+    company: Optional[str] = None
