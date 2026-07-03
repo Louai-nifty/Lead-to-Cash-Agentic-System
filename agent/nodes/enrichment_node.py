@@ -22,11 +22,13 @@ async def enrichment_node(state: AgentState):
             "location" : enrichment_result["data"]["geo"]["city"]
         }
         
-        sup_client.table("Leads").update(company_info).eq("email", email).execute()
+        sup_client.table("Leads").update({"Status": "enriched", **company_info}).eq("email", email).execute()
+        
         
         logger.info("Lead Enrichment Completed")
         
         state.enriched_data = company_info
+        state.status = "enriched"
         return state
     
     except Exception as e:
