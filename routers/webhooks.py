@@ -1,5 +1,7 @@
+import asyncio
 from fastapi import APIRouter, BackgroundTasks, Request
 from fastapi.responses import JSONResponse
+import httpx
 from utils.loggings import get_logger
 from models.requests import TallySubmission, EmailSubmission
 import json
@@ -68,4 +70,35 @@ async def tally_form_webhook(payload: TallySubmission, background_tasks: Backgro
         status_code=200,
         content={"status": "success", "message": "Form submission received and queued for processing"}
     )
-    
+
+
+
+@router.post("/webhook/slack-approval")
+async def slack_approval_webhook(request: Request):
+    """
+    Endpoint to handle Slack approval responses.
+    This endpoint will be called by Slack when a user interacts with the approval buttons.
+    """
+    try:
+        body = await request.json()
+        action = body["actions"][0]
+        lead_id = action["value"].split("_")[1]
+        decision = action["action_id"].split("_")[0]
+        
+
+        response_url = body["response_url"]
+        await httpx.post(response_url, json={"text": "Decision received."})
+        
+        
+        asyncio.create_task(
+            cash_agent.ainvoke(
+                {"approval_decision": decision},
+                config={"configurable": {"thread_id": lead_id}}
+            )
+        )
+        
+        return JSONResponse(status_code=200, content={"status": "success"})
+
+    except Exception as e:
+        logger.error(f"Error processing Slack approval: {str(e)}", exc_info=True)
+        return JSONResponse(status_code=500, content={"status": "error"})
