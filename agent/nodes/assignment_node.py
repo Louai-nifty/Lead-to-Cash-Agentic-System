@@ -12,13 +12,14 @@ async def assignment_node(state: AgentState):
     "The node responsible for the assignment stage of the lead"
     try:
         score = state.lead_score
-        priority = state.lead_priority
         email = state.lead_email
         headcount = state.headcount
         
-        routing = routing_func(score, priority, email)
+        routing = routing_func(score, email)
         
         routing_level = routing["to_what_level"]
+        rep_name = routing["assigned_rep_name"]
+        
         lead_details = sup_client.table("Leads").select("*").eq("email", email).execute().data
         lead_name = lead_details["lead_name"]
         lead_role = lead_details["role"]
@@ -28,8 +29,8 @@ async def assignment_node(state: AgentState):
             
         
         if routing_level == "Junior_Rep":
-            logger.info(f"Lead with email '{email}' has been assigned to a Junior Rep")
-            message = f"""New Lead Assigned to You
+            logger.info(f"Lead with email '{email}' has been assigned to a Junior Rep '{rep_name}'")
+            message = f"""New Lead Assigned to You {rep_name}
 
                 Contact: {lead_name} | {lead_role}
                 Company: {lead_company}
@@ -42,18 +43,18 @@ async def assignment_node(state: AgentState):
                 """
             await slack_notification_tool.ainvoke({"channel": assignment_channel_id, "text": message})
             
-            Rep_name = routing["assigned_rep_name"]
             
-            logger.info(f"Notification sent to Junior Rep '{Rep_name}' for lead with email '{email}'")
+            logger.info(f"Notification sent to Junior Rep '{rep_name}' for lead with email '{email}'")
             
             state.assigned_to = routing["assigned_rep_id"]
             state.rep_email = routing["assigned_to"]
             state.company = lead_company
+            state.rep_name = rep_name
             
             return state
         
         elif routing_level == "Senior_Rep":
-            logger.info(f"Lead with email '{email}' has been assigned to a Senior Rep")
+            logger.info(f"Lead with email '{email}' has been assigned to a Senior Rep '{rep_name}'")
             
             if headcount >= 1000:
                 deal_size = 15000
@@ -65,7 +66,7 @@ async def assignment_node(state: AgentState):
                 deal_size = 2000
                 
             if deal_size < 10000:
-                message = f"""New Lead Assigned to You
+                message = f"""New Lead Assigned to You {rep_name}
 
                 Contact: {lead_name} | {lead_role}
                 Company: {lead_company}
@@ -77,19 +78,17 @@ async def assignment_node(state: AgentState):
                 Please reach out and schedule an initial conversation at your earliest convenience.
                 """
                 await slack_notification_tool.ainvoke({"channel": assignment_channel_id, "text": message})
-                
-                Rep_name = routing["assigned_rep_name"]
             
-                logger.info(f"Notification sent to Senior Rep '{Rep_name}' for lead with email '{email}'")
+                logger.info(f"Notification sent to Senior Rep '{rep_name}' for lead with email '{email}'")
                 
                 state.assigned_to = routing["assigned_rep_id"]
                 state.rep_email = routing["assigned_to"]
                 state.company = lead_company
+                state.rep_name = rep_name
                 
                 return state
             else:
                 logger.info(f"Lead deal size is greater than $10,000, sending to manager for approval")
-                logger.info(f"Waiting for manager approval for lead with email '{email}'...")
                 
                 lead_id = lead_details["id"]
                 
@@ -116,19 +115,23 @@ async def assignment_node(state: AgentState):
                                             {
                                                 "type": "button",
                                                 "text": {"type": "plain_text", "text": "Approve"},
-                                                "value": f"approve_{state.id}",
+                                                "value": f"approve_{lead_id}",
                                                 "action_id": "approve_lead"
                                             },
                                             {
                                                 "type": "button",
                                                 "text": {"type": "plain_text", "text": "Reject"},
-                                                "value": f"reject_{state.id}",
+                                                "value": f"reject_{lead_id}",
                                                 "action_id": "reject_lead"
                                             }
                                         ]
                                     }
                                 ]
                 await slack_notification_tool.ainvoke({"channel": approval_channel_id, "text": "Lead Requires Approval", "blocks": block_content})
+                
+                state.deal_size = deal_size
+                logger.info(f"Waiting for manager approval for lead with email '{email}'...")
+                return state
                     
     except Exception as e:
         logger.error(f"Assignment failed for {state.lead_email}: {str(e)}")
