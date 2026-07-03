@@ -21,11 +21,13 @@ async def scoring_node(state: AgentState):
     
     score = result["lead_score"]
     priority = result["lead_priority"]
+    headcount = result["Size"]
     
     sup_client.table("Leads").update({"lead_score": score, "priority": priority}).eq("email", email).execute()
     logger.info(f"The lead with email '{email}' score and priority has been updated successfuly")
     state.lead_score = score
     state.lead_priority = priority
+    state.headcount = headcount
     
     return state
    except Exception as e:
