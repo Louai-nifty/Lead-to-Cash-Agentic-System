@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposal - {{ company_name }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 8.5in;
+            height: 11in;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+        }
+        .header {
+            border-bottom: 4px solid #003d99;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            color: #003d99;
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+        .header p {
+            color: #666;
+            font-size: 12px;
+        }
+        .proposal-details {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+            font-size: 12px;
+        }
+        .detail-group label {
+            color: #003d99;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .detail-group p {
+            color: #333;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section h2 {
+            color: #003d99;
+            font-size: 16px;
+            border-bottom: 3px solid #003d99;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+        .section p {
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .subsection {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        .subsection h3 {
+            color: #003d99;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 12px;
+        }
+        .pricing-table th {
+            background: #003d99;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        .pricing-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        .pricing-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .total-row {
+            background: #e6f0ff;
+            font-weight: bold;
+            border-top: 2px solid #003d99;
+            border-bottom: 2px solid #003d99;
+        }
+        .cta-section {
+            background: #f0f5ff;
+            padding: 20px;
+            border-left: 5px solid #003d99;
+            margin: 30px 0;
+            font-size: 12px;
+        }
+        .cta-section p {
+            margin-bottom: 10px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: #003d99;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .timeline {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+            font-size: 12px;
+        }
+        .timeline-item {
+            border-left: 3px solid #003d99;
+            padding-left: 15px;
+        }
+        .timeline-item strong {
+            color: #003d99;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .footer {
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+            margin-top: 40px;
+            font-size: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>PROFESSIONAL PROPOSAL</h1>
+            <p>Customized Enterprise Solution</p>
+        </div>
+
+        <div class="proposal-details">
+            <div class="detail-group">
+                <label>CLIENT</label>
+                <p>{{ company_name }}</p>
+                <p>{{ contact_name }}</p>
+            </div>
+            <div class="detail-group">
+                <label>CONTACT</label>
+                <p>{{ contact_email }}</p>
+                <p>{{ contact_phone }}</p>
+            </div>
+            <div class="detail-group">
+                <label>PROPOSAL DATE</label>
+                <p>{{ proposal_date }}</p>
+            </div>
+            <div class="detail-group">
+                <label>VALID UNTIL</label>
+                <p>{{ expiry_date }}</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Executive Summary</h2>
+            <p>{{ company_name }} operates in a competitive landscape where operational efficiency directly impacts revenue growth. Our Professional Package is tailored to address your specific business challenges and deliver measurable ROI within 90 days.</p>
+            <p>This proposal outlines our approach to optimizing your processes, empowering your team, and establishing a foundation for sustainable growth.</p>
+        </div>
+
+        <div class="section">
+            <h2>Business Challenges & Opportunities</h2>
+            <div class="subsection">
+                <h3>Current State</h3>
+                <p>Based on our discovery, {{ company_name }} currently faces manual bottlenecks in key workflows, resulting in extended timelines and resource constraints.</p>
+            </div>
+            <div class="subsection">
+                <h3>Our Solution</h3>
+                <p>We propose a phased implementation approach that minimizes disruption while maximizing adoption across your organization.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Scope of Work</h2>
+            <p>Our Professional Package includes:</p>
+            <ul style="margin-left: 20px; font-size: 12px; color: #555;">
+                <li>Detailed requirements analysis and process mapping</li>
+                <li>Custom implementation for up to 3 departments</li>
+                <li>Integration with existing systems and tools</li>
+                <li>Comprehensive training for up to 20 team members</li>
+                <li>90-day post-launch support and optimization</li>
+                <li>Performance reporting and analytics setup</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Implementation Timeline</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <strong>Phase 1: Discovery (Week 1-2)</strong>
+                    <p>Requirements gathering, stakeholder interviews, and system audit</p>
+                </div>
+                <div class="timeline-item">
+                    <strong>Phase 2: Design (Week 3-4)</strong>
+                    <p>Solution architecture, workflow design, and approval</p>
+                </div>
+                <div class="timeline-item">
+                    <strong>Phase 3: Implementation (Week 5-8)</strong>
+                    <p>System configuration, testing, and deployment</p>
+                </div>
+                <div class="timeline-item">
+                    <strong>Phase 4: Launch (Week 9-12)</strong>
+                    <p>User training, go-live support, and optimization</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Investment</h2>
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th>Deliverable</th>
+                        <th style="text-align: right;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Professional Implementation Package</td>
+                        <td style="text-align: right;">${{ deal_size }}</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td>Total Investment</td>
+                        <td style="text-align: right;">${{ deal_size }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="font-size: 11px; color: #666;">Payment terms: 30% upfront, 40% at implementation start, 30% upon completion. Invoice will be issued upon proposal acceptance.</p>
+        </div>
+
+        <div class="cta-section">
+            <p><strong>Next Steps</strong></p>
+            <p>We're confident this solution will drive meaningful results for {{ company_name }}. Please review this proposal and schedule a brief call to discuss any questions.</p>
+            <a href="{{ signature_link }}" class="cta-button">REVIEW & SIGN</a>
+        </div>
+
+        <div class="footer">
+            <p>This proposal is valid until {{ expiry_date }}. All information is confidential and intended solely for {{ contact_name }} and authorized decision-makers at {{ company_name }}.</p>
+        </div>
+    </div>
+</body>
+</html>

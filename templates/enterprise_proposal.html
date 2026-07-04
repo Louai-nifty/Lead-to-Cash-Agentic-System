@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Proposal - {{ company_name }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 8.5in;
+            height: 11in;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+        }
+        .header {
+            border-bottom: 5px solid #1a3a52;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            color: #1a3a52;
+            font-size: 36px;
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
+        }
+        .header p {
+            color: #7f8c8d;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .proposal-details {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 40px;
+            font-size: 11px;
+        }
+        .detail-group label {
+            color: #1a3a52;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .detail-group p {
+            color: #2c3e50;
+            font-size: 11px;
+        }
+        .section {
+            margin-bottom: 32px;
+        }
+        .section h2 {
+            color: #1a3a52;
+            font-size: 16px;
+            border-bottom: 3px solid #1a3a52;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .section p {
+            font-size: 11px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .subsection {
+            margin-left: 0;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-left: 4px solid #1a3a52;
+        }
+        .subsection h3 {
+            color: #1a3a52;
+            font-size: 12px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .subsection p {
+            font-size: 11px;
+        }
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 11px;
+        }
+        .pricing-table th {
+            background: #1a3a52;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .pricing-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .pricing-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        .total-row {
+            background: #d6e9f5;
+            font-weight: 600;
+            border-top: 2px solid #1a3a52;
+            border-bottom: 2px solid #1a3a52;
+        }
+        .value-proposition {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+            font-size: 11px;
+        }
+        .value-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-top: 3px solid #1a3a52;
+            text-align: center;
+        }
+        .value-item strong {
+            color: #1a3a52;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .cta-section {
+            background: #ecf5ff;
+            padding: 20px;
+            border-left: 6px solid #1a3a52;
+            margin: 30px 0;
+            font-size: 11px;
+        }
+        .cta-section p {
+            margin-bottom: 10px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: #1a3a52;
+            color: white;
+            padding: 12px 28px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-top: 10px;
+            font-size: 11px;
+        }
+        .timeline {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+            font-size: 11px;
+        }
+        .timeline-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 3px solid #1a3a52;
+        }
+        .timeline-item strong {
+            color: #1a3a52;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .footer {
+            border-top: 1px solid #ecf0f1;
+            padding-top: 20px;
+            margin-top: 40px;
+            font-size: 10px;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ENTERPRISE PROPOSAL</h1>
+            <p>Strategic Partnership & Transformation Initiative</p>
+        </div>
+
+        <div class="proposal-details">
+            <div class="detail-group">
+                <label>CLIENT</label>
+                <p>{{ company_name }}</p>
+                <p>{{ company_location }}</p>
+            </div>
+            <div class="detail-group">
+                <label>PRIMARY CONTACT</label>
+                <p>{{ contact_name }}</p>
+                <p>{{ contact_title }}</p>
+            </div>
+            <div class="detail-group">
+                <label>CONTACT DETAILS</label>
+                <p>{{ contact_email }}</p>
+                <p>{{ contact_phone }}</p>
+            </div>
+            <div class="detail-group">
+                <label>PROPOSAL DATE</label>
+                <p>{{ proposal_date }}</p>
+            </div>
+            <div class="detail-group">
+                <label>VALID UNTIL</label>
+                <p>{{ expiry_date }}</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Strategic Overview</h2>
+            <p>{{ company_name }} is positioned for accelerated growth, yet current operational frameworks present constraints on scalability and agility. This Enterprise Partnership proposes a comprehensive transformation initiative designed to align your organization with market dynamics, enhance competitive positioning, and deliver sustained revenue growth.</p>
+            <p>Our approach is grounded in industry best practices, proven methodologies, and deep expertise in enterprises of your scale and complexity.</p>
+        </div>
+
+        <div class="section">
+            <h2>Executive Summary: Value Proposition</h2>
+            <div class="value-proposition">
+                <div class="value-item">
+                    <strong>Operational Efficiency</strong>
+                    <p>40-60% reduction in process cycle time</p>
+                </div>
+                <div class="value-item">
+                    <strong>Revenue Impact</strong>
+                    <p>15-25% increase in conversion rates within 90 days</p>
+                </div>
+                <div class="value-item">
+                    <strong>Team Enablement</strong>
+                    <p>90%+ user adoption across departments</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Business Context & Objectives</h2>
+            <div class="subsection">
+                <h3>Current Landscape</h3>
+                <p>{{ company_name }} currently manages complex workflows across multiple departments with limited visibility, integration, and automation. This creates operational silos, extended sales cycles, and missed revenue opportunities.</p>
+            </div>
+            <div class="subsection">
+                <h3>Strategic Objectives</h3>
+                <p>Transform cross-functional processes, establish enterprise-wide visibility, integrate disparate systems, and enable data-driven decision-making at scale.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Comprehensive Scope of Work</h2>
+            <p>Our Enterprise Package includes:</p>
+            <ul style="margin-left: 20px; font-size: 11px; color: #2c3e50;">
+                <li>Strategic advisory and business process transformation consultation</li>
+                <li>Requirements analysis across up to 5 departments</li>
+                <li>Enterprise system integration with all critical platforms</li>
+                <li>Custom workflows and automation design and implementation</li>
+                <li>Advanced analytics and reporting infrastructure</li>
+                <li>Comprehensive training for up to 100+ team members (executives, managers, end-users)</li>
+                <li>Change management and adoption acceleration services</li>
+                <li>6-month post-launch support with quarterly business reviews</li>
+                <li>Continuous optimization and recommendations for future roadmap</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Implementation Roadmap</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <strong>Phase 1: Foundation (Weeks 1-4)</strong>
+                    <p>Strategy, discovery, stakeholder engagement, requirements finalization</p>
+                </div>
+                <div class="timeline-item">
+                    <strong>Phase 2: Design & Build (Weeks 5-12)</strong>
+                    <p>Solution architecture, system integration, workflow automation</p>
+                </div>
+                <div class="timeline-item">
+                    <strong>Phase 3: Deployment (Weeks 13-16)</strong>
+                    <p>Testing, training, documentation, go-live preparation</p>
+                </div>
+                <div class="timeline-item">
+                    <strong>Phase 4: Optimization (Weeks 17-24)</strong>
+                    <p>Launch support, adoption acceleration, refinement, handoff</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Investment & Commercial Terms</h2>
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th>Service Component</th>
+                        <th style="text-align: right;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Enterprise Transformation Initiative</td>
+                        <td style="text-align: right;">${{ deal_size }}</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td>Total Investment</td>
+                        <td style="text-align: right;">${{ deal_size }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="font-size: 10px; color: #7f8c8d;">Payment terms: 25% upon project initiation, 25% at design completion, 25% at deployment, 25% upon 30-day post-launch review. Flexible alternatives available for qualified enterprises.</p>
+        </div>
+
+        <div class="cta-section">
+            <p><strong>Strategic Partnership Opportunity</strong></p>
+            <p>We view this engagement as the beginning of a strategic partnership with {{ company_name }}. Our commitment extends beyond implementation to ensure sustained success and continuous value realization. We welcome discussion regarding scope, timeline, and investment.</p>
+            <a href="{{ signature_link }}" class="cta-button">REVIEW & EXECUTE</a>
+        </div>
+
+        <div class="footer">
+            <p>This proposal is valid until {{ expiry_date }}. It contains confidential and proprietary information intended exclusively for {{ contact_name }} and authorized decision-makers at {{ company_name }}. Unauthorized disclosure or distribution is prohibited.</p>
+        </div>
+    </div>
+</body>
+</html>
