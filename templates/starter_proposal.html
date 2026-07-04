@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposal - {{ company_name }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 8.5in;
+            height: 11in;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+        }
+        .header {
+            border-bottom: 3px solid #0066cc;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            color: #0066cc;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        .header p {
+            color: #666;
+            font-size: 12px;
+        }
+        .proposal-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            font-size: 13px;
+        }
+        .detail-group {
+            flex: 1;
+        }
+        .detail-group label {
+            color: #0066cc;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .detail-group p {
+            color: #333;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section h2 {
+            color: #0066cc;
+            font-size: 16px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+        .section p {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 13px;
+        }
+        .pricing-table th {
+            background: #f5f5f5;
+            color: #0066cc;
+            padding: 10px;
+            text-align: left;
+            border-bottom: 2px solid #0066cc;
+        }
+        .pricing-table td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .pricing-table tr:last-child td {
+            border-bottom: 2px solid #0066cc;
+            font-weight: bold;
+        }
+        .total-row {
+            background: #f0f7ff;
+        }
+        .cta-section {
+            background: #f5f5f5;
+            padding: 20px;
+            border-left: 4px solid #0066cc;
+            margin: 30px 0;
+            font-size: 13px;
+        }
+        .cta-section p {
+            margin-bottom: 10px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: #0066cc;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .footer {
+            border-top: 1px solid #e0e0e0;
+            padding-top: 20px;
+            margin-top: 40px;
+            font-size: 11px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>PROPOSAL</h1>
+            <p>Professional Services Agreement</p>
+        </div>
+
+        <div class="proposal-details">
+            <div class="detail-group">
+                <label>CLIENT</label>
+                <p>{{ company_name }}</p>
+                <p>{{ contact_name }}</p>
+                <p>{{ contact_email }}</p>
+            </div>
+            <div class="detail-group">
+                <label>PROPOSAL DATE</label>
+                <p>{{ proposal_date }}</p>
+            </div>
+            <div class="detail-group">
+                <label>VALID UNTIL</label>
+                <p>{{ expiry_date }}</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Executive Summary</h2>
+            <p>We are pleased to propose our Starter Package to {{ company_name }}. This solution is designed for growing teams looking to streamline their operations and improve efficiency. Our approach combines proven methodologies with personalized support to ensure your success.</p>
+        </div>
+
+        <div class="section">
+            <h2>Scope of Work</h2>
+            <p>Our Starter Package includes:</p>
+            <ul style="margin-left: 20px; font-size: 13px; color: #555;">
+                <li>Initial consultation and discovery (2 hours)</li>
+                <li>Process audit and recommendations</li>
+                <li>Implementation support for 30 days</li>
+                <li>Training for up to 5 team members</li>
+                <li>Email support during business hours</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Investment</h2>
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th style="text-align: right;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Starter Package</td>
+                        <td style="text-align: right;">${{ deal_size }}</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td>Total Investment</td>
+                        <td style="text-align: right;">${{ deal_size }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="font-size: 12px; color: #666;">Payment terms: 50% upfront, 50% upon completion. Invoice will be sent upon proposal acceptance.</p>
+        </div>
+
+        <div class="cta-section">
+            <p><strong>Ready to get started?</strong></p>
+            <p>We're excited to help {{ company_name }} achieve its goals. To move forward, please review this proposal and let us know if you have any questions.</p>
+            <a href="{{ signature_link }}" class="cta-button">SIGN & ACCEPT</a>
+        </div>
+
+        <div class="footer">
+            <p>This proposal is valid until {{ expiry_date }}. For questions or clarifications, please contact us at {{ company_email }}.</p>
+        </div>
+    </div>
+</body>
+</html>
