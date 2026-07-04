@@ -15,6 +15,7 @@ async def scoring_node(state: AgentState):
     size = response.data[0]["size"]
     industry = response.data[0]["industry"]
     source = response.data[0]["source"]
+    lead_id = response.data[0]["lead_id"]
     
     logger.info(f"lead scoring for {email} has started")
     result = scoring_func(size, industry, source)
@@ -28,6 +29,7 @@ async def scoring_node(state: AgentState):
     state.lead_score = score
     state.lead_priority = priority
     state.headcount = headcount
+    state.lead_id = lead_id
     
     return state
    except Exception as e:
