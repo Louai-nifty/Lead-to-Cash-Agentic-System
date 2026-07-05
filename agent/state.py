@@ -25,4 +25,6 @@ class AgentState(BaseModel):
     deal_size: Optional[int] = None
     
     
+    
+    proposal_send_trigger: Optional[bool] = None
     status: Optional[str] = None
