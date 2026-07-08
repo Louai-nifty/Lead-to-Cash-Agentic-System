@@ -1,4 +1,7 @@
 from typing import Any
+from utils.loggings import get_logger
+
+logger = get_logger(__name__)
 
 def scoring_func(size: Any, industry: str, source: str):
     try:
@@ -22,28 +25,32 @@ def scoring_func(size: Any, industry: str, source: str):
         
         if headcount == "None":
             headcount = 0
-        
-        if "k" in headcount:
-            headcount = headcount.split("-")[0].strip()
-            if "k" in headcount:
-                headcount = headcount.replace("k", "").strip()
-                headcount = int(headcount) * 1000
-        else:
-            headcount = int(headcount.split("-")[1])
+            size_score = 0
             
-        if 1 <= headcount <= 10:
-            size_score = 10
-        elif 10 < headcount <= 50:
-            size_score = 20
-        elif 50 < headcount <= 200:
-            size_score = 30
-        elif 200 < headcount <= 1000:
-            size_score = 40
-        elif headcount > 1000:
-            size_score = 50  
+        else: 
+            if "k" in headcount:
+                headcount = headcount.split("-")[0].strip()
+                if "k" in headcount:
+                    headcount = headcount.replace("k", "").strip()
+                    headcount = int(headcount) * 1000
+            elif "in" in headcount:
+                headcount = int(headcount.split("-")[1])
+            else: 
+                headcount = int(headcount)
+                
+            if 1 <= headcount <= 10:
+                size_score = 10
+            elif 10 < headcount <= 50:
+                size_score = 20
+            elif 50 < headcount <= 200:
+                size_score = 30
+            elif 200 < headcount <= 1000:
+                size_score = 40
+            elif headcount > 1000:
+                size_score = 50  
+            
         
-        
-        final_score = (size_score * 0.4) + (industry_score * 0.35) + (source_score * 0.25)
+        final_score = int((size_score * 0.4) + (industry_score * 0.35) + (source_score * 0.25))
         
         if final_score <= 50:
             priority = "low"
@@ -55,6 +62,7 @@ def scoring_func(size: Any, industry: str, source: str):
         return {"lead_score": final_score, "lead_priority": priority}    
             
     except Exception as e:
-        print(f"An error occured in the scoring func {str(e)}")
+        logger.error(f"Scoring func error: {str(e)}", exc_info=True)
+        return {"lead_score": 70, "lead_priority": "mid"}  
     
     

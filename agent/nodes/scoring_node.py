@@ -30,5 +30,6 @@ async def scoring_node(state: AgentState):
     return state
    except Exception as e:
        logger.error(f"scoring failed, {str(e)}")
+       return state
     
     
