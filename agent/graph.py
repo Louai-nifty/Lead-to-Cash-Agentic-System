@@ -25,4 +25,4 @@ graph.add_edge("assignment", "approval_handler")
 graph.add_edge("approval_handler", END)
 
 checkpointer = MemorySaver()
-cash_agent = graph.compile(checkpointer=get_checkpointer(use_persistence=True), interrupt_before="approval_handler")
+cash_agent = graph.compile(checkpointer=get_checkpointer(use_persistence=True), interrupt_before=["approval_handler"])
