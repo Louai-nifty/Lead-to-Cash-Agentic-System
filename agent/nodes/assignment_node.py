@@ -98,7 +98,7 @@ async def assignment_node(state: AgentState):
                 manager_info = sup_client.table("Users").select("*").eq("role", "Manager").execute().data[0]
                 
                 manager_name = manager_info["name"]
-                lead_id = lead_details["id"]
+                lead_id = lead_details["lead_id"]
                 
                 message = f"""New Lead Assigned to you manager {manager_name} for Approval
                                 Name: {lead_name} | Role: {lead_role}
