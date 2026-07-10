@@ -20,7 +20,7 @@ async def assignment_node(state: AgentState):
         routing_level = routing["to_what_level"]
         rep_name = routing["assigned_rep_name"]
         
-        lead_details = sup_client.table("Leads").select("*").eq("email", email).execute().data
+        lead_details = sup_client.table("Leads").select("*").eq("email", email).execute().data[0]
         lead_name = lead_details["lead_name"]
         lead_role = lead_details["role"]
         lead_source = lead_details["source"]
@@ -144,6 +144,6 @@ async def assignment_node(state: AgentState):
                 return state
                     
     except Exception as e:
-        logger.error(f"Assignment failed for {state.lead_email}: {str(e)}")
+        logger.error(f"Assignment failed for {state.lead_email}: {str(e)}", exc_info=True)
         return state
 
