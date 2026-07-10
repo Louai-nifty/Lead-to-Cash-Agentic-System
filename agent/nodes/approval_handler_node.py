@@ -1,8 +1,8 @@
 from utils.loggings import get_logger
 from database.db import get_client
-from state import AgentState
+from agent.state import AgentState
 from services.routing_service import routing_func
-from tools.notification import slack_notification_tool
+from agent.tools.notification import slack_notification_tool
 from config import assignment_channel_id
 
 logger = get_logger(__name__)
@@ -46,6 +46,7 @@ async def approval_handler_node(state: AgentState):
         
         logger.info(f"Lead with email '{lead_email}' has been assigned to Rep '{rep_name}' after approval from Manager {manager_name}.")
         
+        state.status = "approved"
         return state
     
     elif decision == "reject":
@@ -62,5 +63,5 @@ async def approval_handler_node(state: AgentState):
         await slack_notification_tool.ainvoke({"channel": assignment_channel_id, "text": message})
         
         logger.info(f"Lead with email '{lead_email}' has been marked as rejected after Manager's decision.")
-        
+        state.status = "rejected"
         return state
