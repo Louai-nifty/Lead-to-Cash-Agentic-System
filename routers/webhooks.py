@@ -7,6 +7,7 @@ from models.requests import TallySubmission, EmailSubmission
 import json
 from database.db import get_client
 from agent.graph import cash_agent
+import urllib.parse
 
 sup_client = get_client()
 logger = get_logger(__name__)
@@ -80,15 +81,24 @@ async def slack_approval_webhook(request: Request):
     This endpoint will be called by Slack when a user interacts with the approval buttons.
     """
     try:
-        body = await request.json()
+        # Parse form-encoded data
+        body_str = await request.body()
+        body_str = body_str.decode()
+        
+        if body_str.startswith("payload="):
+            import urllib.parse
+            payload = urllib.parse.unquote(body_str.split("payload=")[1])
+            import json
+            body = json.loads(payload)
+        else:
+            body = await request.json()
+        
         action = body["actions"][0]
         lead_id = action["value"].split("_")[1]
-        decision = action["action_id"].split("_")[0]
+        decision = action["action_id"].split("_")[0]  # "approve" or "reject"
         
-
         response_url = body["response_url"]
         await httpx.post(response_url, json={"text": "Decision received."})
-        
         
         asyncio.create_task(
             cash_agent.ainvoke(
