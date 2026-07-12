@@ -1,3 +1,5 @@
+import json
+
 from agent.state import AgentState
 from utils.loggings import get_logger
 from database.db import get_client
@@ -98,7 +100,13 @@ async def assignment_node(state: AgentState):
                 manager_info = sup_client.table("Users").select("*").eq("role", "Manager").execute().data[0]
                 
                 manager_name = manager_info["name"]
-                lead_id = lead_details["lead_id"]
+                lead_id = state.lead_id
+                approval_context = {
+                    "thread_id": str(lead_id or f"lead:{email}"),
+                    "lead_email": email,
+                    "deal_size": deal_size,
+                    "manager_name": manager_name,
+                }
                 
                 message = f"""New Lead Assigned to you manager {manager_name} for Approval
                                 Name: {lead_name} | Role: {lead_role}
@@ -123,13 +131,13 @@ async def assignment_node(state: AgentState):
                                             {
                                                 "type": "button",
                                                 "text": {"type": "plain_text", "text": "Approve"},
-                                                "value": f"approve_{lead_id}",
+                                                "value": json.dumps({**approval_context, "action": "approve"}),
                                                 "action_id": "approve_lead"
                                             },
                                             {
                                                 "type": "button",
                                                 "text": {"type": "plain_text", "text": "Reject"},
-                                                "value": f"reject_{lead_id}",
+                                                "value": json.dumps({**approval_context, "action": "reject"}),
                                                 "action_id": "reject_lead"
                                             }
                                         ]
