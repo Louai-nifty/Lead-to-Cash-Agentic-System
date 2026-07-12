@@ -4,5 +4,6 @@ from dotenv import load_dotenv
 load_dotenv()  
 
 def get_checkpointer(use_persistence: bool = True):
-    if not use_persistence:
+    if use_persistence:
         return MemorySaver()
+    return None

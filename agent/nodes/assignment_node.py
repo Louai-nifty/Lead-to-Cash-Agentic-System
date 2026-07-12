@@ -1,3 +1,5 @@
+import json
+
 from agent.state import AgentState
 from utils.loggings import get_logger
 from database.db import get_client
@@ -20,13 +22,17 @@ async def assignment_node(state: AgentState):
         routing_level = routing["to_what_level"]
         rep_name = routing["assigned_rep_name"]
         
-        lead_details = sup_client.table("Leads").select("*").eq("email", email).execute().data
+        lead_details = sup_client.table("Leads").select("*").eq("email", email).execute().data[0]
         lead_name = lead_details["lead_name"]
         lead_role = lead_details["role"]
         lead_source = lead_details["source"]
         lead_message = lead_details["message"]
         lead_company = lead_details["company"]
-            
+        
+        if routing_level == "Not_Qualified":
+            logger.info(f"Lead with email '{email}' is not qualified for assignment.")
+            state.status = "rejected"
+            return state
         
         if routing_level == "Junior_Rep":
             logger.info(f"Lead with email '{email}' has been assigned to a Junior Rep '{rep_name}'")
@@ -50,6 +56,7 @@ async def assignment_node(state: AgentState):
             state.rep_email = routing["assigned_to"]
             state.company = lead_company
             state.rep_name = rep_name
+            state.status = "assigned"
             
             return state
         
@@ -85,14 +92,23 @@ async def assignment_node(state: AgentState):
                 state.rep_email = routing["assigned_to"]
                 state.company = lead_company
                 state.rep_name = rep_name
+                state.status = "assigned"
                 
                 return state
             else:
                 logger.info(f"Lead deal size is greater than $10,000, sending to manager for approval")
+                manager_info = sup_client.table("Users").select("*").eq("role", "Manager").execute().data[0]
                 
-                lead_id = lead_details["id"]
+                manager_name = manager_info["name"]
+                lead_id = state.lead_id
+                approval_context = {
+                    "thread_id": str(lead_id or f"lead:{email}"),
+                    "lead_email": email,
+                    "deal_size": deal_size,
+                    "manager_name": manager_name,
+                }
                 
-                message = f"""New Lead Assigned
+                message = f"""New Lead Assigned to you manager {manager_name} for Approval
                                 Name: {lead_name} | Role: {lead_role}
                                 Company: Lead's company name: {lead_company}
                                 Email: {email}
@@ -115,13 +131,13 @@ async def assignment_node(state: AgentState):
                                             {
                                                 "type": "button",
                                                 "text": {"type": "plain_text", "text": "Approve"},
-                                                "value": f"approve_{lead_id}",
+                                                "value": json.dumps({**approval_context, "action": "approve"}),
                                                 "action_id": "approve_lead"
                                             },
                                             {
                                                 "type": "button",
                                                 "text": {"type": "plain_text", "text": "Reject"},
-                                                "value": f"reject_{lead_id}",
+                                                "value": json.dumps({**approval_context, "action": "reject"}),
                                                 "action_id": "reject_lead"
                                             }
                                         ]
@@ -130,9 +146,12 @@ async def assignment_node(state: AgentState):
                 await slack_notification_tool.ainvoke({"channel": approval_channel_id, "text": "Lead Requires Approval", "blocks": block_content})
                 
                 state.deal_size = deal_size
+                state.manager_name = manager_name
                 logger.info(f"Waiting for manager approval for lead with email '{email}'...")
+                state.status = "pending_approval"
                 return state
                     
     except Exception as e:
-        logger.error(f"Assignment failed for {state.lead_email}: {str(e)}")
+        logger.error(f"Assignment failed for {state.lead_email}: {str(e)}", exc_info=True)
+        return state
 

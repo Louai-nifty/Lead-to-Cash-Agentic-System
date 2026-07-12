@@ -3,8 +3,10 @@ from typing import Optional, List
 
 class AgentState(BaseModel):
     # From the Ingestion
-    lead_email: EmailStr
-    lead_domain: str
+
+    lead_email: Optional[EmailStr] = None
+    lead_domain: Optional[str] = None
+
     
     # From the Enrichment
     enriched_data: Optional[dict] = None
@@ -28,4 +30,8 @@ class AgentState(BaseModel):
     proposal_pdf_url: Optional[str] = None
     proposal_status: Optional[str] = None
     proposal_send_trigger: Optional[bool] = None
+
+
+    lead_name: Optional[str] = None
+    company_name: Optional[str] = None
     status: Optional[str] = None
