@@ -1,0 +1,74 @@
+from utils.loggings import get_logger
+from database.db import get_client
+from datetime import datetime, timedelta, time
+from jinja2 import Template
+from weasyprint import HTML
+from config import Company_Email, App_Domain
+
+
+logger = get_logger(__name__)
+sup_client = get_client()
+
+def proposal_generator(email, headcount, deal_size, assigned_to, rep_name, rep_email, lead_id):
+    try:
+        lead = sup_client.table("Leads").select("*").eq("email", email).execute().data[0]
+        lead_name = lead["lead_name"]
+        lead_email = lead["email"]
+        lead_role = lead["role"]
+        contact_phone = lead["phone"]
+        
+        company_name = lead["company"]
+        company_location = lead["location"]
+        
+        proposal_date = datetime.now().strftime("%B %d, %Y")
+        expiry_date = (datetime.now() + timedelta(days=30)).strftime("%B %d, %Y")
+        signature_link = f"{App_Domain}/sign/{lead_id}"
+        company_email = Company_Email
+        
+        
+        if headcount < 50:
+            template_file = "templates/starter_proposal.html"
+        elif headcount < 500:
+            template_file = "templates/professional_proposal.html"
+        else:
+            template_file = "templates/enterprise_proposal.html"
+            
+        
+        with open(template_file, "r") as f:
+            template_content = f.read()
+        
+        template = Template(template_content)
+        filled_html = template.render(
+            company_name=company_name,
+            contact_name=lead_name,
+            contact_email=lead_email,
+            contact_phone=contact_phone,
+            contact_title=lead_role,
+            company_location=company_location,
+            deal_size=deal_size,
+            proposal_date=proposal_date,
+            expiry_date=expiry_date,
+            signature_link=signature_link,
+            company_email=company_email
+        )
+        
+        pdf_bytes = HTML(string=filled_html).write_pdf()
+        pdf_filename = f"proposal_{company_name}_{lead_name}_{int(time.time())}.pdf"
+        pdf_path = f"proposals/{pdf_filename}"
+        
+        sup_client.storage.from_("proposals").upload(pdf_path, pdf_bytes)
+        pdf_url = sup_client.storage.from_("proposals").get_public_url(pdf_path)
+        
+        template_name = template_file.split("/")[-1]
+        
+        sup_client.table("Proposals").insert({
+            "lead_id": lead_id,
+            "assigned_to": assigned_to,
+            "template_name": template_name,
+            "pdf_url": pdf_url,
+            "status": "draft"
+        }).execute()
+    
+        return {"pdf_url": pdf_url, "template": template_name}
+    except Exception as e:
+        logger.error(f"Proposal generation failed: {str(e)}")

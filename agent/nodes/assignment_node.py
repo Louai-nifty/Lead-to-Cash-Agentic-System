@@ -2,7 +2,7 @@ from agent.state import AgentState
 from utils.loggings import get_logger
 from database.db import get_client
 from services.routing_service import routing_func
-from tools.notification import slack_notification_tool
+from agent.tools.notification import slack_notification_tool
 from config import assignment_channel_id, approval_channel_id
 
 sup_client = get_client()

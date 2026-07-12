@@ -7,6 +7,7 @@ from models.requests import TallySubmission, EmailSubmission
 import json
 from database.db import get_client
 from agent.graph import cash_agent
+from langgraph import command
 
 sup_client = get_client()
 logger = get_logger(__name__)
@@ -50,11 +51,17 @@ async def process_form_submission(payload: TallySubmission) -> None:
             sup_client.table("Leads").insert(lead_data).execute()
         else:
             sup_client.table("Leads").update({"Status":"old"}).eq("email", lead_email).execute()
+            
+        lead = sup_client.table("Leads").select("lead_id").eq("email", lead_email).execute().data[0]
+        
+        lead_id = lead["lead_id"]
         
         await cash_agent.ainvoke({
             "lead_email": lead_data['email'],
-            "lead_domain": domain
-        })
+            "lead_domain": domain,
+        },
+            config={"configurable": {"thread_id": lead_id}}
+        )
     except Exception as e:
         logger.error(f"Error processing form submission: {str(e)}", exc_info=True)
 
