@@ -59,7 +59,7 @@ def scoring_func(size: Any, industry: str, source: str):
         elif final_score > 74:
             priority = "high"
         
-        return {"lead_score": final_score, "lead_priority": priority}    
+        return {"lead_score": final_score, "lead_priority": priority, "Size": headcount}    
             
     except Exception as e:
         logger.error(f"Scoring func error: {str(e)}", exc_info=True)
