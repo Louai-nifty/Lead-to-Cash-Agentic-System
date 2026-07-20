@@ -1,9 +1,14 @@
 from utils.loggings import get_logger
 from database.db import get_client
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta
+import time
 from jinja2 import Template
-from weasyprint import HTML
 from config import Company_Email, App_Domain
+
+try:
+    from weasyprint import HTML as WeasyHTML
+except Exception:
+    WeasyHTML = None
 
 
 logger = get_logger(__name__)
@@ -52,16 +57,22 @@ def proposal_generator(email, headcount, deal_size, assigned_to, rep_name, rep_e
             company_email=company_email
         )
         
-        pdf_bytes = HTML(string=filled_html).write_pdf()
-        pdf_filename = f"proposal_{company_name}_{lead_name}_{int(time.time())}.pdf"
-        pdf_path = f"proposals/{pdf_filename}"
+        if WeasyHTML is None:
+            pdf_bytes = filled_html.encode("utf-8")
+            pdf_filename = f"proposal_{company_name}_{lead_name}_{int(time.time())}.html"
+            pdf_path = f"proposals/{pdf_filename}"
+            logger.warning("WeasyPrint is unavailable; saving proposal HTML fallback instead of PDF")
+        else:
+            pdf_bytes = WeasyHTML(string=filled_html).write_pdf()
+            pdf_filename = f"proposal_{company_name}_{lead_name}_{int(time.time())}.pdf"
+            pdf_path = f"proposals/{pdf_filename}"
         
         sup_client.storage.from_("proposals").upload(pdf_path, pdf_bytes)
         pdf_url = sup_client.storage.from_("proposals").get_public_url(pdf_path)
         
         template_name = template_file.split("/")[-1]
         
-        sup_client.table("Proposals").insert({
+        sup_client.table("proposals").insert({
             "lead_id": lead_id,
             "assigned_to": assigned_to,
             "template_name": template_name,
