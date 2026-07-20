@@ -8,15 +8,11 @@ from models.requests import TallySubmission, EmailSubmission
 import json
 from database.db import get_client
 from agent.graph import cash_agent
-<<<<<<< HEAD
-from langgraph import command
-=======
 from agent.state import AgentState
 from agent.nodes.approval_handler_node import approval_handler_node
 from langgraph.errors import GraphInterrupt
 from langgraph.types import Command
 import urllib.parse
->>>>>>> main
 
 sup_client = get_client()
 logger = get_logger(__name__)
@@ -148,11 +144,8 @@ async def process_form_submission(payload: TallySubmission) -> None:
             lead_record = insert_response.data[0] if insert_response.data else None
         else:
             sup_client.table("Leads").update({"Status":"old"}).eq("email", lead_email).execute()
-<<<<<<< HEAD
-            
-        lead = sup_client.table("Leads").select("lead_id").eq("email", lead_email).execute().data[0]
+        lead_id = sup_client.table("Leads").select("lead_id").eq("email", lead_email).execute().data[0]["lead_id"]
         
-        lead_id = lead["lead_id"]
         
         await cash_agent.ainvoke({
             "lead_email": lead_data['email'],
@@ -160,8 +153,8 @@ async def process_form_submission(payload: TallySubmission) -> None:
         },
             config={"configurable": {"thread_id": lead_id}}
         )
-=======
-            lead_record = response.data[0] if response.data else None
+
+        lead_record = response.data[0] if response.data else None
 
         thread_id = _build_thread_id(
             lead_email,
@@ -179,7 +172,7 @@ async def process_form_submission(payload: TallySubmission) -> None:
             )
         except GraphInterrupt:
             logger.info("Workflow paused for manager approval")
->>>>>>> main
+
     except Exception as e:
         logger.error(f"Error processing form submission: {str(e)}", exc_info=True)
 
@@ -264,12 +257,17 @@ async def handle_proposal_action(request: Request):
         action_id = action["action_id"]
     
         response_url = body["response_url"]
-        await httpx.post(response_url, json={"text": "Processing..."})
+        httpx.post(response_url, json={"text": "Processing..."})
+        
+        
     
         if action_id == "send_proposal":
             asyncio.create_task(
                 cash_agent.ainvoke(
-                    {"proposal_send_trigger": True},
+                    Command(
+                        update={"proposal_send_trigger": True},
+                        goto="proposal_sender"
+                    ),
                     config={"configurable": {"thread_id": lead_id}}
                 )
             )
