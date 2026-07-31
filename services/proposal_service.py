@@ -56,16 +56,19 @@ def proposal_generator(email, headcount, deal_size, assigned_to, rep_name, rep_e
             signature_link=signature_link,
             company_email=company_email
         )
-        
-        if WeasyHTML is None:
-            pdf_bytes = filled_html.encode("utf-8")
-            pdf_filename = f"proposal_{company_name}_{lead_name}_{int(time.time())}.html"
-            pdf_path = f"proposals/{pdf_filename}"
-            logger.warning("WeasyPrint is unavailable; saving proposal HTML fallback instead of PDF")
-        else:
-            pdf_bytes = WeasyHTML(string=filled_html).write_pdf()
-            pdf_filename = f"proposal_{company_name}_{lead_name}_{int(time.time())}.pdf"
-            pdf_path = f"proposals/{pdf_filename}"
+
+        pdf_bytes = filled_html.encode("utf-8")
+        pdf_filename = f"proposal_{company_name}_{lead_name}_{int(time.time())}.html"
+        pdf_path = f"proposals/{pdf_filename}"
+
+        if WeasyHTML is not None:
+            try:
+                pdf_bytes = WeasyHTML(string=filled_html).write_pdf()
+                pdf_filename = f"proposal_{company_name}_{lead_name}_{int(time.time())}.pdf"
+                pdf_path = pdf_filename
+                logger.info("PDF generated successfully via WeasyPrint")
+            except Exception as e:
+                logger.warning(f"WeasyPrint failed ({str(e)}); using HTML fallback instead")
         
         sup_client.storage.from_("proposals").upload(pdf_path, pdf_bytes)
         pdf_url = sup_client.storage.from_("proposals").get_public_url(pdf_path)
@@ -79,7 +82,10 @@ def proposal_generator(email, headcount, deal_size, assigned_to, rep_name, rep_e
             "pdf_url": pdf_url,
             "status": "draft"
         }).execute()
+        
+        logger.info("The prosposal has been drafted and inserted in the database")
     
         return {"pdf_url": pdf_url, "template": template_name}
     except Exception as e:
         logger.error(f"Proposal generation failed: {str(e)}")
+        raise
