@@ -250,18 +250,22 @@ async def slack_approval_webhook(request: Request):
 @router.post("/slack/proposal-action")
 async def handle_proposal_action(request: Request):
     try:
-        body = await request.json()
-    
+        body_str = (await request.body()).decode()
+        body = _parse_slack_body(body_str)
+
         action = body["actions"][0]
         lead_id = action["value"].split("_")[1]
         action_id = action["action_id"]
-    
         response_url = body["response_url"]
-        httpx.post(response_url, json={"text": "Processing..."})
-        
-        
-    
-        if action_id == "send_proposal":
+
+        if action_id == "review_proposal":
+            logger.info(f"Rep is reviewing the proposal for lead {lead_id}")
+
+        elif action_id == "send_proposal":
+            httpx.post(response_url, json={
+                "replace_original": True,
+                "text": "Sending proposal to the lead now..."
+            })
             asyncio.create_task(
                 cash_agent.ainvoke(
                     Command(
@@ -271,7 +275,7 @@ async def handle_proposal_action(request: Request):
                     config={"configurable": {"thread_id": lead_id}}
                 )
             )
-    
+
         return JSONResponse(status_code=200, content={"status": "success"})
 
     except Exception as e:
