@@ -25,15 +25,13 @@ graph.set_entry_point("enrichment")
 graph.add_edge("enrichment", "scoring")
 graph.add_edge("scoring", "assignment")
 graph.add_edge("assignment", "approval_handler")
-graph.add_edge("approval_handler", "proposal")
 graph.add_edge("proposal", "proposal_sender")
 graph.add_edge("proposal_sender", END)
 
 graph.add_conditional_edges(
-    "assignment",
-    lambda state: "END" if state.status == "rejected" else "proposal_node",
-    {"END": END, "proposal": proposal_node}
+    "approval_handler",
+    lambda state: END if state.status == "rejected" else "proposal"
 )
 
 checkpointer = MemorySaver()
-cash_agent = graph.compile(checkpointer=get_checkpointer(use_persistence=True), interrupt_before="approval_handler", interrupt_after=["assignment", "approval_handler", "proposal"])
+cash_agent = graph.compile(checkpointer=get_checkpointer(use_persistence=True), interrupt_before=["approval_handler"], interrupt_after=["assignment", "approval_handler", "proposal"])
