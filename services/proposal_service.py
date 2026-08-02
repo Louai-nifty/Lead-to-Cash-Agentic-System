@@ -58,20 +58,26 @@ def proposal_generator(email, headcount, deal_size, assigned_to, rep_name, rep_e
         )
 
         pdf_bytes = filled_html.encode("utf-8")
-        pdf_filename = f"proposal_{company_name}_{lead_name}_{int(time.time())}.html"
+        safe_company = company_name.replace(" ", "_")
+        safe_lead = lead_name.replace(" ", "_")
+        pdf_filename = f"proposal_{safe_company}_{safe_lead}_{int(time.time())}.html"
         pdf_path = f"proposals/{pdf_filename}"
 
         if WeasyHTML is not None:
             try:
                 pdf_bytes = WeasyHTML(string=filled_html).write_pdf()
-                pdf_filename = f"proposal_{company_name}_{lead_name}_{int(time.time())}.pdf"
+                pdf_filename = f"proposal_{safe_company}_{safe_lead}_{int(time.time())}.pdf"
                 pdf_path = pdf_filename
                 logger.info("PDF generated successfully via WeasyPrint")
             except Exception as e:
                 logger.warning(f"WeasyPrint failed ({str(e)}); using HTML fallback instead")
         
         sup_client.storage.from_("proposals").upload(pdf_path, pdf_bytes)
-        pdf_url = sup_client.storage.from_("proposals").get_public_url(pdf_path)
+        
+        if pdf_filename.endswith(".html"):
+            pdf_url = f"{App_Domain}/proposals/view/{pdf_filename}"
+        else:
+            pdf_url = sup_client.storage.from_("proposals").get_public_url(pdf_path)
         
         template_name = template_file.split("/")[-1]
         
