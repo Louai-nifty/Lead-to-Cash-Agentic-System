@@ -1,7 +1,7 @@
 import asyncio
 import re
 from fastapi import APIRouter, BackgroundTasks, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 import httpx
 from utils.loggings import get_logger
 from models.requests import TallySubmission, EmailSubmission
@@ -272,7 +272,7 @@ async def handle_proposal_action(request: Request):
                         update={"proposal_send_trigger": True},
                         goto="proposal_sender"
                     ),
-                    config={"configurable": {"thread_id": lead_id}}
+                    config={"configurable": {"thread_id": int(lead_id) if lead_id.isdigit() else lead_id}}
                 )
             )
 
@@ -281,3 +281,13 @@ async def handle_proposal_action(request: Request):
     except Exception as e:
         logger.error(f"Error processing Slack approval: {str(e)}", exc_info=True)
         return JSONResponse(status_code=500, content={"status": "error"})
+
+@router.get("/proposals/view/{filename}")
+async def view_proposal(filename: str):
+    try:
+        # Fetch the raw HTML file bytes from Supabase storage
+        file_bytes = sup_client.storage.from_("proposals").download(f"proposals/{filename}")
+        return HTMLResponse(content=file_bytes)
+    except Exception as e:
+        logger.error(f"Failed to fetch proposal {filename}: {str(e)}")
+        return HTMLResponse(content="<h1>Proposal not found or an error occurred.</h1>", status_code=404)
