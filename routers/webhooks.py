@@ -1,3 +1,4 @@
+from _pytest import config
 import asyncio
 import re
 from fastapi import APIRouter, BackgroundTasks, Request
@@ -137,13 +138,13 @@ async def process_form_submission(payload: TallySubmission) -> None:
         lead_record = None
 
         if count == 0:
-            lead_data['Status'] = "new"
+            lead_data['status'] = "new"
             lead_data['source'] = "tally_form"
             lead_data['form_sub_json'] = payload.model_dump()
             insert_response = sup_client.table("Leads").insert(lead_data).execute()
             lead_record = insert_response.data[0] if insert_response.data else None
         else:
-            sup_client.table("Leads").update({"Status":"old"}).eq("email", lead_email).execute()
+            sup_client.table("Leads").update({"status":"old"}).eq("email", lead_email).execute()
         lead_id = sup_client.table("Leads").select("lead_id").eq("email", lead_email).execute().data[0]["lead_id"]
         
         
@@ -151,7 +152,7 @@ async def process_form_submission(payload: TallySubmission) -> None:
             "lead_email": lead_data['email'],
             "lead_domain": domain,
         },
-            config={"configurable": {"thread_id": lead_id}}
+            config={"configurable": {"thread_id": str(lead_id)}}
         )
 
         lead_record = response.data[0] if response.data else None
@@ -254,7 +255,7 @@ async def handle_proposal_action(request: Request):
         body = _parse_slack_body(body_str)
 
         action = body["actions"][0]
-        lead_id = action["value"].split("_")[1]
+        lead_id = str(action["value"].split("_", 1)[1])
         action_id = action["action_id"]
         response_url = body["response_url"]
 
@@ -266,13 +267,14 @@ async def handle_proposal_action(request: Request):
                 "replace_original": True,
                 "text": "Sending proposal to the lead now..."
             })
+            config={"configurable": {"thread_id": lead_id}}
+            snapshot = await cash_agent.aget_state(config)
+            logger.info(f"🔍 SNAPSHOT NEXT NODES: {snapshot.next}")
+            
             asyncio.create_task(
                 cash_agent.ainvoke(
-                    Command(
-                        update={"proposal_send_trigger": True},
-                        goto="proposal_sender"
-                    ),
-                    config={"configurable": {"thread_id": int(lead_id) if lead_id.isdigit() else lead_id}}
+                    None,
+                    config={"configurable": {"thread_id": lead_id}}
                 )
             )
 
