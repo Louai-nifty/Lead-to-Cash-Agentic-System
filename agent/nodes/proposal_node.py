@@ -68,7 +68,7 @@ async def proposal_node(state: AgentState):
                         ]
         
         sup_client.table("proposals").update({"status": "awaiting"}).eq("pdf_url", pdf_url).execute()
-        await slack_notification_tool.ainvoke({"channel": proposals_channel_id, "text": message, "blocks": block_content})
+        await slack_notification_tool.ainvoke({"channel": proposals_channel_id, "text": message, "webhook_type": "proposal", "blocks": block_content})
         
         logger.info(f"proposal has been sent to Rep {rep_name} on Slack for review")
 

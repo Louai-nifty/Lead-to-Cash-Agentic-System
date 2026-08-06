@@ -47,7 +47,7 @@ async def assignment_node(state: AgentState):
 
                 Please reach out and schedule an initial conversation at your earliest convenience.
                 """
-            await slack_notification_tool.ainvoke({"channel": assignment_channel_id, "text": message})
+            await slack_notification_tool.ainvoke({"channel": assignment_channel_id, "text": message, "webhook_type": "approval"})
             
             
             logger.info(f"Notification sent to Junior Rep '{rep_name}' for lead with email '{email}'")
@@ -84,7 +84,7 @@ async def assignment_node(state: AgentState):
 
                 Please reach out and schedule an initial conversation at your earliest convenience.
                 """
-                await slack_notification_tool.ainvoke({"channel": assignment_channel_id, "text": message})
+                await slack_notification_tool.ainvoke({"channel": assignment_channel_id, "text": message, "webhook_type": "approval"})
             
                 logger.info(f"Notification sent to Senior Rep '{rep_name}' for lead with email '{email}'")
                 
@@ -143,7 +143,7 @@ async def assignment_node(state: AgentState):
                                         ]
                                     }
                                 ]
-                await slack_notification_tool.ainvoke({"channel": approval_channel_id, "text": "Lead Requires Approval", "blocks": block_content})
+                await slack_notification_tool.ainvoke({"channel": approval_channel_id, "text": "Lead Requires Approval", "webhook_type": "approval", "blocks": block_content})
                 
                 state.deal_size = deal_size
                 state.manager_name = manager_name
