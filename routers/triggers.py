@@ -7,8 +7,8 @@ from email.header import decode_header
 from utils.loggings import get_logger
 from typing import List, Dict
 from database.db import get_client
-from agent.graph import cash_agent
 from config import GMAIL_EMAIL, GMAIL_APP_PASSWORD, IMAP_SERVER, IMAP_PORT
+from fastapi import Request
 
 logger = get_logger(__name__)
 
@@ -56,32 +56,32 @@ async def fetch_new_emails() -> List[Dict]:
         
         logger.info(f"Found {len(email_ids)} new emails")
         
-        # Process each email
+        
         for email_id in email_ids:
             try:
-                # Fetch email
+                
                 status, msg_data = mail.fetch(email_id, "(RFC822)")
                 
                 if status != "OK":
                     logger.warning(f"Failed to fetch email {email_id}")
                     continue
                 
-                # Parse email
+                
                 msg = email.message_from_bytes(msg_data[0][1])
                 
-                # Extract sender email
+                
                 from_email = msg.get("From", "")
-                # Clean up email format (extract just the email part if it's "Name <email@domain.com>")
+                
                 if "<" in from_email and ">" in from_email:
                     from_email = from_email.split("<")[1].split(">")[0]
                 
-                # Extract subject
+                
                 subject_line = decode_header_line(msg.get("Subject", "No Subject"))
                 
-                # Extract email body
+                
                 email_body = extract_email_body(msg)
                 
-                # Create email data dictionary matching EmailSubmission model
+                
                 email_data = {
                     "from_email": from_email,
                     "subject_line": subject_line,
@@ -142,27 +142,27 @@ def extract_email_body(msg) -> str:
     
     try:
         if msg.is_multipart():
-            # For multipart emails, get the first plain text part
+            
             for part in msg.walk():
                 content_type = part.get_content_type()
                 content_disposition = str(part.get("Content-Disposition", ""))
                 
-                # Skip attachments
+                
                 if "attachment" in content_disposition:
                     continue
                 
-                # Get plain text
+                
                 if content_type == "text/plain":
                     charset = part.get_content_charset()
                     body = part.get_payload(decode=True).decode(charset or "utf-8", errors="replace")
                     break
                 
-                # Fallback to HTML if no plain text
+                
                 elif content_type == "text/html" and not body:
                     charset = part.get_content_charset()
                     body = part.get_payload(decode=True).decode(charset or "utf-8", errors="replace")
         else:
-            # Simple text email
+            
             charset = msg.get_content_charset()
             body = msg.get_payload(decode=True).decode(charset or "utf-8", errors="replace")
     
@@ -170,13 +170,13 @@ def extract_email_body(msg) -> str:
         logger.warning(f"Error extracting email body: {str(e)}")
         body = ""
     
-    # Clean up body (remove excess whitespace)
+    
     body = body.strip()
     return body if body else "No content"
 
 
 @scheduler.scheduled_job('interval', minutes=5)
-async def poll_gmail():
+async def poll_gmail(request: Request):
     """
     Scheduler job that runs every 4 minutes to poll Gmail for new emails.
     Fetches new emails and prepares them for processing.
@@ -203,9 +203,9 @@ async def poll_gmail():
                     sup_client.table("Leads").insert(lead_data).execute()
                 else:
                     sup_client.table("Leads").update({"Status":"old"}).eq("email", lead_data['email']).execute()
-                    
-                # The invocation of the agent    
-                cash_agent.invoke({
+                     
+                agent = request.app.state.agent    
+                agent.invoke({
                     "lead_email": lead_data['email'],
                     "lead_domain": lead_data['domain']
                     })
