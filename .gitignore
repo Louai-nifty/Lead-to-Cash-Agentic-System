@@ -58,6 +58,9 @@ context.md
 tests/
 
 config.py
+checkpoints.db
+checkpoints.db-shm
+checkpoints.db-wal
 
 # Django stuff:
 *.log
