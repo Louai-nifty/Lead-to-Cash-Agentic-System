@@ -26,7 +26,7 @@ graph.add_edge("assignment", "approval_handler")
 
 graph.add_conditional_edges(
     "approval_handler",
-    lambda state: "proposal" if state.approval_decision == "approve" else END
+    lambda state: "proposal" if state.approval_decision == "approved" else END
 )
 
 graph.add_edge("proposal", "proposal_sender")

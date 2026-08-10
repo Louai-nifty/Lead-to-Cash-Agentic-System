@@ -63,11 +63,11 @@ async def approval_handler_node(state: AgentState):
                                 (This lead has been approved by Manager {manager_name} and assigned to you for follow-up.)
                         """
         
-        await slack_notification_tool.ainvoke({"channel": assignment_channel_id, "text": message})
+        await slack_notification_tool.ainvoke({"channel": assignment_channel_id, "text": message, "webhook_type": "approval"})
         
         logger.info(f"Lead with email '{lead_email}' has been assigned to Rep '{rep_name}' after approval from Manager {manager_name}.")
         
-        state.status = "approved"
+        state.approval_decision = "approved"
         return state
     
     elif decision == "reject":
@@ -81,8 +81,8 @@ async def approval_handler_node(state: AgentState):
                                 (This lead has been rejected by Manager {manager_name} and will not be pursued further.)
                         """
         
-        await slack_notification_tool.ainvoke({"channel": assignment_channel_id, "text": message})
+        await slack_notification_tool.ainvoke({"channel": assignment_channel_id, "text": message, "webhook_type": "approval"})
         
         logger.info(f"Lead with email '{lead_email}' has been marked as rejected after Manager's decision.")
-        state.status = "rejected"
+        state.approval_decision = "rejected"
         return state
