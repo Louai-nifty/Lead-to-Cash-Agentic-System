@@ -43,6 +43,7 @@ async def approval_handler_node(state: AgentState):
         routing = routing_func(score, lead_email)
         rep_name = routing["assigned_rep_name"]
         rep_email = routing["assigned_to"]
+        rep_id = routing["assigned_rep_id"]
         
         lead_details = sup_client.table("Leads").select("*").eq("email", lead_email).execute().data[0]
         lead_name = lead_details["lead_name"]
@@ -68,6 +69,9 @@ async def approval_handler_node(state: AgentState):
         logger.info(f"Lead with email '{lead_email}' has been assigned to Rep '{rep_name}' after approval from Manager {manager_name}.")
         
         state.approval_decision = "approved"
+        state.assigned_to = rep_id
+        state.rep_email = rep_email
+        state.rep_name = rep_name
         return state
     
     elif decision == "reject":
