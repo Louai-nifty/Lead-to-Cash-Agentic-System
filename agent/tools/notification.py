@@ -19,9 +19,9 @@ async def slack_notification_tool(channel: str, text: str, webhook_type: str, bl
 
       else:
         if webhook_type == "proposal":
-          await proposalclient.send_message(channel, text, blocks)
+          await proposalclient.send_approval_request(channel, text, blocks)
         else:
-          await approvalclient.send_message(channel, text, blocks)
+          await approvalclient.send_approval_request(channel, text, blocks)
           
   except Exception as e:
       logger.error(f"Failed to send slack notification, {str(e)}")
