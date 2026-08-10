@@ -8,7 +8,6 @@ from utils.loggings import get_logger
 from models.requests import TallySubmission, EmailSubmission
 import json
 from database.db import get_client
-from agent.state import AgentState
 import urllib.parse
 
 sup_client = get_client()
