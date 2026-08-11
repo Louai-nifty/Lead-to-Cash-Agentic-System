@@ -209,3 +209,26 @@ async def view_proposal(filename: str):
     except Exception as e:
         logger.error(f"Failed to fetch proposal {filename}: {str(e)}")
         return HTMLResponse(content="<h1>Proposal not found or an error occurred.</h1>", status_code=404)
+
+
+
+@router.post("/contract/sign/{lead_id}")
+async def sign_contract(lead_id: str, request: Request, background_tasks: BackgroundTasks):
+    """
+    Lead clicks signature link from proposal email.
+    Triggers contract generation.
+    """
+    try:
+        logger.info("Lead clicked the signature link. Contract generation is about to start.")
+        agent = request.app.state.agent
+        config={"configurable": {"thread_id": lead_id}}
+        background_tasks.add_task(
+            agent.ainvoke,
+            None,
+            config=config
+        )
+
+
+    except Exception as e:
+        logger.error(f"Error generating contract for lead {lead_id}: {str(e)}")
+        return HTMLResponse(content="<h1>Error generating contract. Please contact support.</h1>", status_code=500)
