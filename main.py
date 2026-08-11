@@ -10,7 +10,7 @@ async def lifespan(app: FastAPI):
         app.state.agent = graph.compile(
             checkpointer=checkpointer,
             interrupt_before=["approval_handler"],
-            interrupt_after=["assignment", "proposal"]
+            interrupt_after=["assignment", "proposal", "proposal_sender"]
         )
         yield
 
