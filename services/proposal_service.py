@@ -27,7 +27,7 @@ def proposal_generator(email, headcount, deal_size, assigned_to, rep_name, rep_e
         
         proposal_date = datetime.now().strftime("%B %d, %Y")
         expiry_date = (datetime.now() + timedelta(days=30)).strftime("%B %d, %Y")
-        signature_link = f"{App_Domain}/sign/{lead_id}"
+        signature_link = f"{App_Domain}/contract/sign/{lead_id}"
         company_email = Company_Email
         
         
