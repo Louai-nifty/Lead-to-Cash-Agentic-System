@@ -27,10 +27,14 @@ async def create_opensign_contact(email: str, name: str, role: str, company: str
         raise
 
 @tool
-async def create_opensign_document(template_id: str, document_name: str, signers: list, company_name: str, client_name: str, deal_size: str, date: str) -> dict:
+async def create_opensign_document(template_id: str, document_name: str, signers: list, company_name: str, client_name: str, deal_size: str, date: str, expiry_days: int = 21, signing_order: str = "sequential", send_now: bool = True, document_category: str = "contract") -> dict:
     """
     Create document from OpenSign template with signer details.
     Returns document ID and details.
+    
+    Signing order: sequential (lead signs first, then rep)
+    Expiry: 21 days
+    Send: Immediately
     """
     try:
         logger.info(f"Creating OpenSign document: {document_name}")
@@ -46,7 +50,11 @@ async def create_opensign_document(template_id: str, document_name: str, signers
             template_id=template_id,
             document_name=document_name,
             signers=signers,
-            default_values=default_values
+            default_values=default_values,
+            expiry_days=expiry_days,
+            signing_order=signing_order,
+            send_now=send_now,
+            document_category=document_category
         )
         logger.info(f"Document created: {document['id']}")
         return document
