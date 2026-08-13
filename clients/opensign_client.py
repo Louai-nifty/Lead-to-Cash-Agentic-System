@@ -33,13 +33,17 @@ class OpenSignClient:
             response.raise_for_status()
             return response.json()
     
-    async def create_document(self, template_id: str, document_name: str, signers: list, default_values: dict = None) -> dict:
-        """Create document from template with signer details"""
+    async def create_document(self, template_id: str, document_name: str, signers: list, default_values: dict = None, expiry_days: int = 21, signing_order: str = "sequential", send_now: bool = True, document_category: str = "contract") -> dict:
+        """Create document from template with signer details and settings"""
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             payload = {
                 "templateId": template_id,
                 "documentName": document_name,
-                "signers": signers
+                "signers": signers,
+                "expiryDays": expiry_days,
+                "signingOrder": signing_order,
+                "sendNow": send_now,
+                "documentCategory": document_category
             }
             if default_values:
                 payload["defaultValues"] = default_values
