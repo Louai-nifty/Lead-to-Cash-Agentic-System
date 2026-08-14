@@ -76,3 +76,14 @@ async def setup_opensign_webhook(webhook_url: str) -> dict:
     except Exception as e:
         logger.error(f"Failed to setup webhook: {str(e)}")
         raise
+
+@tool
+async def get_opensign_contact(contact_id: str) -> dict:
+    try:
+        logger.info(f"Fetching OpenSign contact: {contact_id}")
+        contact = await opensign_client.get_contact(contact_id)
+        logger.info(f"Contact fetched: {contact_id}")
+        return contact
+    except Exception as e:
+        logger.error(f"Failed to get contact: {str(e)}")
+        raise

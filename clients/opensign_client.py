@@ -80,3 +80,13 @@ class OpenSignClient:
             )
             response.raise_for_status()
             return response.json()
+
+    async def get_contact(self, contact_id: str) -> dict:
+        """Get contact details by contact ID"""
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
+            response = await client.get(
+                f"{self.base_url}/contacts/{contact_id}",
+                headers=self.headers
+            )
+            response.raise_for_status()
+            return response.json()
