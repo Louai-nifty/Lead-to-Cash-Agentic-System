@@ -56,6 +56,7 @@ async def assignment_node(state: AgentState):
             state.rep_email = routing["assigned_to"]
             state.company = lead_company
             state.rep_name = rep_name
+            state.rep_level = "Junior_Rep"
             state.status = "assigned"
             
             return state
@@ -92,6 +93,7 @@ async def assignment_node(state: AgentState):
                 state.rep_email = routing["assigned_to"]
                 state.company = lead_company
                 state.rep_name = rep_name
+                state.rep_level = "Senior_Rep"
                 state.status = "assigned"
                 
                 return state

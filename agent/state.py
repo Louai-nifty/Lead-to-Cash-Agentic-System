@@ -1,3 +1,4 @@
+from pydantic.v1 import NoneStrBytes
 from pydantic import BaseModel, Field, EmailStr
 from typing import Optional, List
 
@@ -21,6 +22,7 @@ class AgentState(BaseModel):
     # From the Assignment & Routing
     rep_email : Optional[EmailStr] = None
     rep_name: Optional[str] = None
+    rep_level: Optional[str] = None
     assigned_to: Optional[str] = None #the rep_id 
     manager_name: Optional[str] = None
     approval_decision: Optional[str] = None
