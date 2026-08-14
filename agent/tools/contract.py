@@ -27,36 +27,21 @@ async def create_opensign_contact(email: str, name: str, role: str, company: str
         raise
 
 @tool
-async def create_opensign_document(template_id: str, document_name: str, signers: list, company_name: str, client_name: str, deal_size: str, date: str, expiry_days: int = 21, signing_order: str = "sequential", send_now: bool = True, document_category: str = "contract") -> dict:
-    """
-    Create document from OpenSign template with signer details.
-    Returns document ID and details.
-    
-    Signing order: sequential (lead signs first, then rep)
-    Expiry: 21 days
-    Send: Immediately
-    """
+async def create_opensign_document(file_base64: str, title: str, signers: list, note: str = None, description: str = None, time_to_complete_days: int = 21, send_in_order: bool = True, send_email: bool = True) -> dict:
     try:
-        logger.info(f"Creating OpenSign document: {document_name}")
-        
-        default_values = {
-            "company_name": company_name,
-            "client_name": client_name,
-            "deal_size": deal_size,
-            "date": date
-        }
-        
+        logger.info(f"Creating OpenSign document: {title}")
+
         document = await opensign_client.create_document(
-            template_id=template_id,
-            document_name=document_name,
+            file_base64=file_base64,
+            title=title,
             signers=signers,
-            default_values=default_values,
-            expiry_days=expiry_days,
-            signing_order=signing_order,
-            send_now=send_now,
-            document_category=document_category
+            note=note,
+            description=description,
+            time_to_complete_days=time_to_complete_days,
+            send_in_order=send_in_order,
+            send_email=send_email
         )
-        logger.info(f"Document created: {document['id']}")
+        logger.info(f"Document created: {document['objectId']}")
         return document
     except Exception as e:
         logger.error(f"Failed to create document: {str(e)}")
