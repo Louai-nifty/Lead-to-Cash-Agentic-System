@@ -79,6 +79,10 @@ async def setup_opensign_webhook(webhook_url: str) -> dict:
 
 @tool
 async def get_opensign_contact(contact_id: str) -> dict:
+    """
+    Get contact details by contact ID.
+    Returns contact data and signature status.
+    """
     try:
         logger.info(f"Fetching OpenSign contact: {contact_id}")
         contact = await opensign_client.get_contact(contact_id)
@@ -86,4 +90,19 @@ async def get_opensign_contact(contact_id: str) -> dict:
         return contact
     except Exception as e:
         logger.error(f"Failed to get contact: {str(e)}")
+        raise
+
+@tool
+async def get_opensign_contact_list() -> dict:
+    """
+    Get all contacts in the OpenSign account.
+    Returns contact data and signature status.
+    """
+    try:
+        logger.info("Fetching OpenSign contact list")
+        contacts = await opensign_client.get_contact_list()
+        logger.info(f"Contact list fetched: {len(contacts.get('contacts', []))} contacts")
+        return contacts
+    except Exception as e:
+        logger.error(f"Failed to get contact list: {str(e)}")
         raise

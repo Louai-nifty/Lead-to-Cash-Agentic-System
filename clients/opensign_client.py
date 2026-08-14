@@ -90,3 +90,12 @@ class OpenSignClient:
             )
             response.raise_for_status()
             return response.json()
+
+    async def get_contact_list(self) -> dict:
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
+            response = await client.get(
+                f"{self.base_url}/contactlist",
+                headers=self.headers
+            )
+            response.raise_for_status()
+        return response.json()
