@@ -33,23 +33,23 @@ class OpenSignClient:
             response.raise_for_status()
             return response.json()
     
-    async def create_document(self, template_id: str, document_name: str, signers: list, default_values: dict = None, expiry_days: int = 21, signing_order: str = "sequential", send_now: bool = True, document_category: str = "contract") -> dict:
-        """Create document from template with signer details and settings"""
+    async def create_document(self, file_base64: str, title: str, signers: list, note: str = None, description: str = None, time_to_complete_days: int = 21, send_in_order: bool = True, send_email: bool = True) -> dict:
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             payload = {
-                "templateId": template_id,
-                "documentName": document_name,
+                "file": file_base64,
+                "title": title,
                 "signers": signers,
-                "expiryDays": expiry_days,
-                "signingOrder": signing_order,
-                "sendNow": send_now,
-                "documentCategory": document_category
+                "timeToCompleteDays": time_to_complete_days,
+                "sendInOrder": send_in_order,
+                "send_email": send_email
             }
-            if default_values:
-                payload["defaultValues"] = default_values
-            
+            if note:
+                payload["note"] = note
+            if description:
+                payload["description"] = description
+
             response = await client.post(
-                f"{self.base_url}/createdocument/{template_id}",
+                f"{self.base_url}/createdocument",
                 json=payload,
                 headers=self.headers
             )
