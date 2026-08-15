@@ -1,6 +1,5 @@
 from langchain_core.tools import tool
 from clients.opensign_client import OpenSignClient
-from config import OPENSIGN_TEMPLATE_ID
 from utils.loggings import get_logger
 from typing import Optional
 
@@ -28,6 +27,10 @@ async def create_opensign_contact(email: str, name: str, role: str, company: str
 
 @tool
 async def create_opensign_document(file_base64: str, title: str, signers: list, note: str = None, description: str = None, time_to_complete_days: int = 21, send_in_order: bool = True, send_email: bool = True) -> dict:
+    """
+    Create a new document (contract) in OpenSign and send it to signers.
+    Returns document data and signature status.
+    """ 
     try:
         logger.info(f"Creating OpenSign document: {title}")
 
