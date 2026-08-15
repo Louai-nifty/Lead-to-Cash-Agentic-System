@@ -107,7 +107,7 @@ async def proposal_send_node(state: AgentState):
         </html>
         """
         
-        success = await smtp_client.send_proposal(lead_email, subject, html_content)
+        success = await smtp_client.send_email(lead_email, subject, html_content)
         
         if success:
             logger.info(f"proposal has been sent to lead {lead_name} with {lead_email}")

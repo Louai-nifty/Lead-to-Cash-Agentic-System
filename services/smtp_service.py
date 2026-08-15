@@ -14,7 +14,7 @@ class SMTPService:
         self.smtp_password = SMTP_PASSWORD
         self.from_email = SMTP_FROM
     
-    async def send_proposal(self, to_email: str, subject: str, html_content: str) -> bool:
+    async def send_email(self, to_email: str, subject: str, html_content: str) -> bool:
         try:
             msg = MIMEMultipart("alternative")
             msg["Subject"] = subject
