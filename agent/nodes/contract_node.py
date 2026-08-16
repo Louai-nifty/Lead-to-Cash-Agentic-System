@@ -161,8 +161,8 @@ async def contract_generation_node(state: AgentState) -> AgentState:
                 "rep_signer_id": rep_signer_id,
                 "sent_at":datetime.now(),
                 "contract_data": contact_data,
-                "lead_sign_url": url_links["lead_sign_url"],
-                "rep_sign_url": url_links["rep_sign_url"]
+                "lead_sign_url": lead_link,
+                "rep_sign_url": rep_link
         }).execute()
 
         logger.info("Contract created successfully")
