@@ -326,6 +326,7 @@ async def opensign_webhook(request: Request, background_tasks: BackgroundTasks):
                 None,
                 config=config
             )
+            logger.info("The invoice node has been triggered successfully!")
 
         
         return JSONResponse(status_code=200, content={"status": "success", "event": event_type})
