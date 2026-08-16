@@ -1,6 +1,8 @@
+from fastapi import requests
 from _pytest import config
 import asyncio
 import re
+from datetime import datetime
 from fastapi import APIRouter, BackgroundTasks, Request
 from fastapi.responses import JSONResponse, HTMLResponse
 import httpx
@@ -9,6 +11,8 @@ from models.requests import TallySubmission, EmailSubmission
 import json
 from database.db import get_client
 import urllib.parse
+from agent.tools.notification import slack_notification_tool
+from config import contracts_channel_id
 
 sup_client = get_client()
 logger = get_logger(__name__)
@@ -213,6 +217,7 @@ async def view_proposal(filename: str):
 
 
 @router.post("/contract/sign/{lead_id}")
+
 async def sign_contract(lead_id: str, request: Request, background_tasks: BackgroundTasks):
     """
     Lead clicks signature link from proposal email.
@@ -232,3 +237,103 @@ async def sign_contract(lead_id: str, request: Request, background_tasks: Backgr
     except Exception as e:
         logger.error(f"Error generating contract for lead {lead_id}: {str(e)}")
         return HTMLResponse(content="<h1>Error generating contract. Please contact support.</h1>", status_code=500)
+
+
+@router.post("/webhook/opensign-listener")
+async def opensign_webhook(request: Request, background_tasks: BackgroundTasks):
+    """
+    Handle OpenSign events (signing, completion, etc.).
+    and triggers the next node (invoice & payment) once the document is signed by both parties.
+    """
+    try:
+        data = await request.json()
+        
+        event_type = data["event"]
+        logger.info(f"OpenSign event received: {event_type}")
+
+        document_id = data["objectId"]
+        
+
+        if not document_id:
+            logger.warning("No document_id in OpenSign event")
+            return JSONResponse(status_code=400, content={"status": "error", "message": "Missing document_id"})
+
+        contract_response = sup_client.table("contracts").select("lead_id, opensign_id, contract_data, rep_sign_url").eq("opensign_id", document_id).execute()
+
+        lead_id = contract_response.data[0]["lead_id"]
+
+        lead_data = sup_client.table("Leads").select("lead_email, lead_name").eq("id", lead_id).execute().data[0]
+        lead_email = lead_data["lead_email"]
+        lead_name = lead_data["lead_name"]
+
+        rep_id = sup_client.table("Leads").select("assigned_rep_id").eq("id", lead_id).execute().data[0]
+        rep_data = sup_client.table("Users").select("name, email").eq("id", rep_id["assigned_rep_id"]).execute().data[0]
+        rep_name = rep_data["name"]
+        rep_email = rep_data["email"]
+
+        rep_link = contract_response.data[0]["rep_sign_url"] 
+
+
+        if contract_response.count == 0:
+            logger.error(f"Contract not found in Supabase for document_id: {document_id}")
+            return JSONResponse(status_code=404, content={"status": "error", "message": "Contract not found"})
+
+        if event_type == "signed":
+            signer_email = data["signer"]["email"]
+            if signer_email == lead_email:
+
+                logger.info(f"Contract {document_id} has been signed by {lead_email}")
+
+                sup_client.table("contracts").update({"lead_signed_at": datetime.now(), "status": "half-signed"}).eq("opensign_id", document_id).execute()
+
+                message = f"""Lead {lead_name} has signed the contract,The contract is ready for the rep's {rep_name} to sign
+                
+                Link to sign : {rep_link}"""
+
+                await slack_notification_tool.ainvoke({"channel": contracts_channel_id, "text": message, "webhook_type": "contract"})
+            elif signer_email == rep_email:
+
+                logger.info(f"Contract {document_id} has been signed by Rep {rep_name}")
+
+                sup_client.table("contracts").update({"rep_signed_at": datetime.now(), "status": "half-signed"}).eq("opensign_id", document_id).execute()
+
+        elif event_type == "viewed":
+            if signer_email == lead_email:
+                logger.info(f"Contract {document_id} has been viewed by {lead_email} at {datetime.now()}")
+                sup_client.table("contracts").update({"lead_viewed_at": datetime.now(), "status": "viewed"}).eq("opensign_id", document_id).execute()
+            elif signer_email == rep_email:
+                logger.info(f"Contract {document_id} has been viewed by Rep {rep_name} at {datetime.now()}")
+                sup_client.table("contracts").update({"rep_viewed_at": datetime.now(), "status": "viewed"}).eq("opensign_id", document_id).execute()
+                
+            logger.info(f"Contract {document_id} viewed for lead {lead_id}")
+
+        elif event_type == "expired":
+            logger.info(f"Contract {document_id} expired for lead {lead_email}")
+            sup_client.table("contracts").update({"status": "expired"}).eq("opensign_id", document_id).execute()
+
+        elif event_type == "declined":
+            logger.info(f"Contract {document_id} declined for lead {lead_email}")
+            sup_client.table("contracts").update({"status": "declined"}).eq("opensign_id", document_id).execute()
+
+        elif event_type == "completed":
+            logger.info(f"Contract {document_id} has been signed by both parties")
+            sup_client.table("contracts").update({"status": "completed","updated_at": datetime.now()}).eq("opensign_id", document_id).execute()
+
+            agent = request.app.state.agent
+            config={"configurable": {"thread_id": lead_id}}
+            background_tasks.add_task(
+                agent.ainvoke,
+                None,
+                config=config
+            )
+
+        
+        return JSONResponse(status_code=200, content={"status": "success", "event": event_type})
+        
+
+    except json.JSONDecodeError:
+        logger.error("Invalid JSON in OpenSign webhook")
+        return JSONResponse(status_code=400, content={"status": "error", "message": "Invalid JSON payload"})
+    except Exception as e:
+        logger.error(f"Error processing OpenSign webhook: {str(e)}", exc_info=True)
+        return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
