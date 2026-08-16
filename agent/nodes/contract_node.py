@@ -3,7 +3,7 @@ from datetime import datetime
 from agent.state import AgentState
 from utils.loggings import get_logger
 from database.db import get_client
-from agent.tools.contract import create_opensign_contact, create_opensign_document, get_opensign_document, setup_opensign_webhook, get_opensign_contact, get_opensign_contact_list
+from agent.tools.contract import create_opensign_contact, create_opensign_document, get_opensign_document, get_opensign_contact_list
 from services.contract_service import generate_contract_pdf
 from services.smtp_service import SMTPService
 
@@ -93,21 +93,6 @@ async def contract_generation_node(state: AgentState) -> AgentState:
                 }
             ]
 
-        contract_id = response["objectId"]
-        link = response["signurl"][0]["url"]
-
-        subject = f"You have a new contract to sign {lead_name} from {company_name}"
-        html_content = f"""
-        <html>
-            <body>
-                <p>Hi {lead_name},</p>
-                <p>Please review and sign your contract here:</p>
-                <a href="{link}">View Contract</a>
-                <p>Looking forward to your feedback.</p>
-            </body>
-        </html>
-        """
-
         response = await create_opensign_document.ainvoke(
             file_base64=file_base64,
             title=f"Contract Agreement for {lead_name} from {company_name}",
@@ -117,6 +102,33 @@ async def contract_generation_node(state: AgentState) -> AgentState:
             email_subject=subject,
             email_body=html_content
         )
+        
+        contract_id = response["objectId"]
+        url_links = {}
+        for signer in response["signurl"]:
+            email = signer['email'].lower()
+            url = signer['url']
+
+            if email == lead_email.lower():
+                url_links['lead_sign_url'] = url
+            elif email == rep_email.lower():
+                url_links['rep_sign_url'] = url
+
+        lead_link = url_links["lead_sign_url"]  
+        rep_link = url_links["rep_sign_url"]
+        subject = f"You have a new contract to sign {lead_name} from {company_name}"
+        html_content = f"""
+        <html>
+            <body>
+                <p>Hi {lead_name},</p>
+                <p>Please review and sign your contract here:</p>
+                <a href="{lead_link}">View Contract</a>
+                <p>Looking forward to your feedback.</p>
+            </body>
+        </html>
+        """
+
+
 
         logger.info(f"Contract created successfully {contract_id} for {lead_name} with {lead_email}")
 
@@ -129,10 +141,13 @@ async def contract_generation_node(state: AgentState) -> AgentState:
             return AgentState(
                 error=f"Failed to send contract {contract_id} to {lead_email}"
             )
+        
+        doc = await get_opensign_document.ainvoke(contract_id)
+        file_url = doc["file"]
 
         contact_data = {
             "document_name": f"{lead_name}_Contract",
-            "opensign_document_url": link,
+            "opensign_document_url": file_url,
             "signing_order": "sequential",
             "expiry_days": 21,
             "created_at": datetime.now().isoformat()
@@ -145,7 +160,9 @@ async def contract_generation_node(state: AgentState) -> AgentState:
                 "lead_signer_id": lead_signer_id,
                 "rep_signer_id": rep_signer_id,
                 "sent_at":datetime.now(),
-                "contract_data": contact_data
+                "contract_data": contact_data,
+                "lead_sign_url": url_links["lead_sign_url"],
+                "rep_sign_url": url_links["rep_sign_url"]
         }).execute()
 
         logger.info("Contract created successfully")
