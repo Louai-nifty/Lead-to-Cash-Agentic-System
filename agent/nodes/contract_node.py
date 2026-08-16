@@ -166,11 +166,7 @@ async def contract_generation_node(state: AgentState) -> AgentState:
         }).execute()
 
         logger.info("Contract created successfully")
-        
-
         return state
-
-
 
     except Exception as e:
         logger.error(f"Failed to create contract: {str(e)}")
