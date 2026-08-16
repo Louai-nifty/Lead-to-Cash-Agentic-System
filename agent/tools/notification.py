@@ -1,4 +1,4 @@
-from clients.slack_client import SlackProposalClient, SlackApprovalClient
+from clients.slack_client import SlackProposalClient, SlackApprovalClient, SlackContractClient
 from langchain_core.tools import tool
 from utils.loggings import get_logger
 from typing import Optional
@@ -25,8 +25,6 @@ async def slack_notification_tool(channel: str, text: str, webhook_type: str, bl
           await proposalclient.send_approval_request(channel, text, blocks)
         elif webhook_type == "approval":
           await approvalclient.send_approval_request(channel, text, blocks)
-        elif webhook_type == "contract":
-          await contractclient.send_approval_request(channel, text, blocks)
           
   except Exception as e:
       logger.error(f"Failed to send slack notification, {str(e)}")
