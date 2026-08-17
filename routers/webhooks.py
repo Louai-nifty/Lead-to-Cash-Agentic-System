@@ -249,16 +249,32 @@ async def opensign_webhook(request: Request, background_tasks: BackgroundTasks):
         data = await request.json()
         
         event_type = data["event"]
-        logger.info(f"OpenSign event received: {event_type}")
-
-        document_id = data["objectId"]
         
+        document_id = data["objectId"]
+        logger.info(f"OpenSign event received: {event_type} for {document_id}")
 
         if not document_id:
             logger.warning("No document_id in OpenSign event")
             return JSONResponse(status_code=400, content={"status": "error", "message": "Missing document_id"})
 
-        contract_response = sup_client.table("contracts").select("lead_id, opensign_id, contract_data, rep_sign_url").eq("opensign_id", document_id).execute()
+        if event_type == "created":
+            logger.info(f"Ignoring 'created' event for {document_id} to allow DB insert to complete.")
+            return JSONResponse(status_code=200, content={"status": "success"})
+
+        contract_response = None
+        max_retries = 6
+        retry_delay = 1 
+
+        for attempt in range(max_retries):
+            contract_response = sup_client.table("contracts").select(
+                "lead_id, opensign_id, contract_data, rep_sign_url"
+            ).eq("opensign_id", document_id).execute()
+            
+            if contract_response.data:
+                break
+            
+            logger.warning(f"Contract not found on attempt {attempt + 1} for {document_id}. Retrying in {retry_delay}s...")
+            await asyncio.sleep(retry_delay)
 
         lead_id = contract_response.data[0]["lead_id"]
 
@@ -271,12 +287,7 @@ async def opensign_webhook(request: Request, background_tasks: BackgroundTasks):
         rep_name = rep_data["name"]
         rep_email = rep_data["email"]
 
-        rep_link = contract_response.data[0]["rep_sign_url"] 
-
-
-        if contract_response.count == 0:
-            logger.error(f"Contract not found in Supabase for document_id: {document_id}")
-            return JSONResponse(status_code=404, content={"status": "error", "message": "Contract not found"})
+        rep_link = contract_response.data[0]["rep_sign_url"]
 
         if event_type == "signed":
             signer_email = data["signer"]["email"]
