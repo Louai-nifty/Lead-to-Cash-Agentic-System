@@ -7,7 +7,7 @@ logger = get_logger(__name__)
 opensign_client = OpenSignClient()
 
 @tool
-async def create_opensign_contact(email: str, name: str, role: str, company: str ,phone: Optional[Any] = None) -> dict:
+async def create_opensign_contact(email: str, name: str, job_title: str, company: str ,phone: Optional[Any] = None) -> dict:
     """
     Create a new contact (signer) in OpenSign.
     Returns contact ID and details.
@@ -17,7 +17,7 @@ async def create_opensign_contact(email: str, name: str, role: str, company: str
         contact = await opensign_client.create_contact(
             email=email,
             name=name,
-            role=role,
+            job_title=job_title,
             company=company,
             phone=phone
         )
