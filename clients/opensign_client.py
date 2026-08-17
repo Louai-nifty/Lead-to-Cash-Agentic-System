@@ -61,7 +61,7 @@ class OpenSignClient:
         """Get document details including signing status"""
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             response = await client.get(
-                f"{self.base_url}/documents/{document_id}",
+                f"{self.base_url}/document/{document_id}",
                 headers=self.headers
             )
             response.raise_for_status()

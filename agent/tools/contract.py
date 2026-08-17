@@ -60,7 +60,7 @@ async def get_opensign_document(document_id: str) -> dict:
     """
     try:
         logger.info(f"Fetching OpenSign document: {document_id}")
-        document = await opensign_client.get_document(document_id)
+        document = await opensign_client.get_document(document_id=document_id)
         logger.info(f"Document fetched: {document_id}")
         return document
     except Exception as e:
