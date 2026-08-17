@@ -15,15 +15,16 @@ class OpenSignClient:
             "Accept": "application/json"
         }
     
-    async def create_contact(self, email: str, name: str, phone: str = None) -> dict:
+    async def create_contact(self, email: str, name: str, role: str, company: str, phone: str) -> dict:
         """Create a new contact (signer) in OpenSign"""
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             payload = {
                 "email": email,
-                "name": name
+                "name": name,
+                "role": role,
+                "company": company,
+                "phone": phone
             }
-            if phone:
-                payload["phone"] = phone
             
             response = await client.post(
                 f"{self.base_url}/createcontact",

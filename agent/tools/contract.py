@@ -1,13 +1,13 @@
 from langchain_core.tools import tool
 from clients.opensign_client import OpenSignClient
 from utils.loggings import get_logger
-from typing import Optional
+from typing import Optional, Any
 
 logger = get_logger(__name__)
 opensign_client = OpenSignClient()
 
 @tool
-async def create_opensign_contact(email: str, name: str, role: str, company: str ,phone: Optional[str] = None) -> dict:
+async def create_opensign_contact(email: str, name: str, role: str, company: str ,phone: Optional[Any] = None) -> dict:
     """
     Create a new contact (signer) in OpenSign.
     Returns contact ID and details.
@@ -17,6 +17,8 @@ async def create_opensign_contact(email: str, name: str, role: str, company: str
         contact = await opensign_client.create_contact(
             email=email,
             name=name,
+            role=role,
+            company=company,
             phone=phone
         )
         logger.info(f"Contact created: {contact['id']}")
