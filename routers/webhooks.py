@@ -284,7 +284,7 @@ async def opensign_webhook(request: Request, background_tasks: BackgroundTasks):
 
                 logger.info(f"Contract {document_id} has been signed by {lead_email}")
 
-                sup_client.table("contracts").update({"lead_signed_at": datetime.now(), "status": "half-signed"}).eq("opensign_id", document_id).execute()
+                sup_client.table("contracts").update({"lead_signed_at": datetime.now().isoformat(), "status": "half-signed"}).eq("opensign_id", document_id).execute()
 
                 message = f"""Lead {lead_name} has signed the contract,The contract is ready for the rep's {rep_name} to sign
                 
@@ -295,15 +295,15 @@ async def opensign_webhook(request: Request, background_tasks: BackgroundTasks):
 
                 logger.info(f"Contract {document_id} has been signed by Rep {rep_name}")
 
-                sup_client.table("contracts").update({"rep_signed_at": datetime.now(), "status": "half-signed"}).eq("opensign_id", document_id).execute()
+                sup_client.table("contracts").update({"rep_signed_at": datetime.now().isoformat(), "status": "half-signed"}).eq("opensign_id", document_id).execute()
 
         elif event_type == "viewed":
             if signer_email == lead_email:
                 logger.info(f"Contract {document_id} has been viewed by {lead_email} at {datetime.now()}")
-                sup_client.table("contracts").update({"lead_viewed_at": datetime.now(), "status": "viewed"}).eq("opensign_id", document_id).execute()
+                sup_client.table("contracts").update({"lead_viewed_at": datetime.now().isoformat(), "status": "viewed"}).eq("opensign_id", document_id).execute()
             elif signer_email == rep_email:
                 logger.info(f"Contract {document_id} has been viewed by Rep {rep_name} at {datetime.now()}")
-                sup_client.table("contracts").update({"rep_viewed_at": datetime.now(), "status": "viewed"}).eq("opensign_id", document_id).execute()
+                sup_client.table("contracts").update({"rep_viewed_at": datetime.now().isoformat(), "status": "viewed"}).eq("opensign_id", document_id).execute()
                 
             logger.info(f"Contract {document_id} viewed for lead {lead_id}")
 
@@ -317,7 +317,7 @@ async def opensign_webhook(request: Request, background_tasks: BackgroundTasks):
 
         elif event_type == "completed":
             logger.info(f"Contract {document_id} has been signed by both parties")
-            sup_client.table("contracts").update({"status": "completed","updated_at": datetime.now()}).eq("opensign_id", document_id).execute()
+            sup_client.table("contracts").update({"status": "completed","updated_at": datetime.now().isoformat()}).eq("opensign_id", document_id).execute()
 
             agent = request.app.state.agent
             config={"configurable": {"thread_id": lead_id}}
