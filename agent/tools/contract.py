@@ -21,7 +21,7 @@ async def create_opensign_contact(email: str, name: str, job_title: str, company
             company=company,
             phone=phone
         )
-        logger.info(f"Contact created: {contact['id']}")
+        logger.info(f"Contact created: {contact['objectId']}")
         return contact
     except Exception as e:
         logger.error(f"Failed to create contact: {str(e)}")
@@ -106,7 +106,6 @@ async def get_opensign_contact_list() -> dict:
     try:
         logger.info("Fetching OpenSign contact list")
         contacts = await opensign_client.get_contact_list()
-        logger.info(f"Contact list fetched: {len(contacts.get('contacts', []))} contacts")
         return contacts
     except Exception as e:
         logger.error(f"Failed to get contact list: {str(e)}")
