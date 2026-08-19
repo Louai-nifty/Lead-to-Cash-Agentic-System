@@ -20,7 +20,7 @@ class PayPalClient:
             "Accept": "application/json"
         }
     
-    async def create_draft_invoice(self, detail: Dict[str, Any], invoicer: Dict[str, Any], primary_recipients: List[Dict[str, Any]], items: List[Dict[str, Any]],additional_recipients: Optional[List[str]] = None,configuration: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def create_draft_invoice(self, detail: Dict[str, Any], invoicer: Dict[str, Any], primary_recipients: List[Dict[str, Any]], items: List[Dict[str, Any]],additional_recipients: Optional[List[str]] = None) -> Dict[str, Any]:
         """
         Creates a draft invoice in PayPal.
         """
@@ -35,8 +35,6 @@ class PayPalClient:
         if additional_recipients is not None:
             payload["additional_recipients"] = additional_recipients
             
-        if configuration is not None:
-            payload["configuration"] = configuration
 
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             try:

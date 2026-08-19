@@ -7,7 +7,7 @@ logger = get_logger(__name__)
 paypal_client = PayPalClient()
 
 @tool
-async def create_invoice(detail: Dict[str, Any], invoicer: Dict[str, Any], primary_recipients: List[Dict[str, Any]], items: List[Dict[str, Any]],additional_recipients: Optional[List[str]] = None,configuration: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+async def create_invoice(detail: Dict[str, Any], invoicer: Dict[str, Any], primary_recipients: List[Dict[str, Any]], items: List[Dict[str, Any]],additional_recipients: Optional[List[str]] = None) -> Dict[str, Any]:
     """
     Creates a draft invoice in PayPal. 
     Returns the invoice details including the PayPal invoice ID and status.
@@ -19,8 +19,7 @@ async def create_invoice(detail: Dict[str, Any], invoicer: Dict[str, Any], prima
             invoicer=invoicer,
             primary_recipients=primary_recipients,
             items=items,
-            additional_recipients=additional_recipients,
-            configuration=configuration
+            additional_recipients=additional_recipients
         )
         logger.info(f"PayPal draft invoice created successfully with ID: {invoice.get('id')}")
         return invoice
