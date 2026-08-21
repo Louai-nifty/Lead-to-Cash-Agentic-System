@@ -37,3 +37,5 @@ class AgentState(BaseModel):
     lead_name: Optional[str] = None
     company_name: Optional[str] = None
     status: Optional[str] = None
+
+    error_message: Optional[str] = None
