@@ -1,3 +1,4 @@
+from agent.state import AgentState
 from fastapi import requests
 from _pytest import config
 import asyncio
@@ -350,3 +351,36 @@ async def opensign_webhook(request: Request, background_tasks: BackgroundTasks):
     except Exception as e:
         logger.error(f"Error processing OpenSign webhook: {str(e)}", exc_info=True)
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
+
+
+@router.post("/webhook/paypal-payment")
+async def paypal_payment_webhook(request: Request, background_tasks: BackgroundTasks):
+    try:
+        data = await request.json()
+
+        event_id = data["id"]
+        event_type = data["event_type"]
+        event_time = data["create_time"]
+
+        if event_type == "INVOICING.INVOICE.CREATED":
+            logger.info(f"Invoice {event_id} has been created")
+
+        elif event_type == "INVOICING.INVOICE.PAID":
+            logger.info(f"Invoice {event_id} has been paid")
+        
+        
+        elif event_type == "INVOICING.INVOICE.CANCELLED":
+            logger.info(f"Invoice {event_id} has been cancelled")
+        
+        elif event_type == "INVOICING.INVOICE.REFUNDED":
+            logger.info(f"Invoice {event_id} has been refunded")
+        
+            
+        
+
+
+        
+        
+    except Exception as e:
+        logger.error(f"Error processing PayPal payment webhook: {str(e)}", exc_info=True)
+        return AgentState(status="error", error_message=f"Error processing PayPal payment webhook: {str(e)}") 
