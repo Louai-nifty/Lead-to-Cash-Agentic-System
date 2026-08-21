@@ -56,12 +56,14 @@ context.md
 *.mo
 *.pot
 tests/
+combined_code.tmp
 
 config.py
 checkpoints.db
 checkpoints.db-shm
 checkpoints.db-wal
 todos.txt
+endpoints_details.txt
 # Django stuff:
 *.log
 local_settings.py
