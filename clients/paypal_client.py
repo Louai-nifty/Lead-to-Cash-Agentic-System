@@ -1,13 +1,13 @@
 import httpx
 from utils.loggings import get_logger
 from typing import Optional, List, Dict, Any
-from config import Paypal_Base_Url, Paypal_Access_Token
+import config
 
 logger = get_logger(__name__)
 
 class PayPalClient:
     def __init__(self):
-        self.base_url = Paypal_Base_Url
+        self.base_url = config.Paypal_Base_Url
         self.timeout = 30
     
     async def create_draft_invoice(self, detail: Dict[str, Any], invoicer: Dict[str, Any], primary_recipients: List[Dict[str, Any]], items: List[Dict[str, Any]],additional_recipients: Optional[List[str]] = None) -> Dict[str, Any]:
@@ -26,9 +26,10 @@ class PayPalClient:
 
 
         headers = {
-            "Authorization": f"Bearer {Paypal_Access_Token}",
+            "Authorization": f"Bearer {config.Paypal_Access_Token}",
             "Content-Type": "application/json",
-            "Accept": "application/json"
+            "Accept": "application/json",
+            "Prefer": "return=representation"
         }
 
 
@@ -66,9 +67,10 @@ class PayPalClient:
             payload["additional_recipients"] = additional_recipients
 
         headers = {
-            "Authorization": f"Bearer {Paypal_Access_Token}",
+            "Authorization": f"Bearer {config.Paypal_Access_Token}",
             "Content-Type": "application/json",
-            "Accept": "application/json"
+            "Accept": "application/json",
+            "Prefer": "return=representation"
         }
 
 

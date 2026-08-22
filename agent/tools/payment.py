@@ -21,7 +21,6 @@ async def create_invoice(detail: Dict[str, Any], invoicer: Dict[str, Any], prima
             items=items,
             additional_recipients=additional_recipients
         )
-        logger.info(f"PayPal draft invoice created successfully with ID: {invoice.get('id')}")
         return invoice
     except Exception as e:
         logger.error(f"Failed to create PayPal draft invoice: {str(e)}")

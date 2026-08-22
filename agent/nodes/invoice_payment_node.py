@@ -29,7 +29,7 @@ async def payment_node(state: AgentState):
             "invoice_date": datetime.now().strftime("%Y-%m-%d"),
             "currency_code": "USD", 
             "payment_term": {
-                "term_type": "DUE_ON_RECEIPT",
+                "term_type": "DUE_ON_DATE_SPECIFIED",
                 "due_date": due_date
             }
                 }
@@ -90,7 +90,7 @@ async def payment_node(state: AgentState):
     except Exception as e:
         logger.error(f"Error creating invoice: {str(e)}")
         return AgentState(error_message=f"Error creating invoice: {str(e)}")
-
+"""
     try:
         await send_invoice.ainvoke({
                 "invoice_id": invoice_id,
@@ -106,4 +106,4 @@ async def payment_node(state: AgentState):
         sup_client.table("invoices").update({"status": "sent", "updated_at": datetime.now().isoformat()}).eq("invoice_id", invoice_id).execute()
     except Exception as e:
         logger.error(f"Error sending invoice: {str(e)}")
-        return AgentState(error_message=f"Error sending invoice: {str(e)}")
+        return AgentState(error_message=f"Error sending invoice: {str(e)}")"""
