@@ -3,7 +3,8 @@ from utils.loggings import get_logger
 from agent.tools.payment import create_invoice, send_invoice
 from database.db import get_client
 from datetime import date, datetime, timedelta
-from config import COMPANY_NAME, COMPANY_ADDRESS, BILLING_EMAIL
+from config import COMPANY_NAME, COMPANY_ADDRESS, BILLING_EMAIL, Invoices_Channel_ID
+from agent.tools.notification import slack_notification_tool
 
 
 sup_client = get_client()
@@ -105,6 +106,17 @@ async def payment_node(state: AgentState):
         logger.info("The invoice has been sent successfully")
 
         sup_client.table("invoices").update({"status": "sent", "updated_at": datetime.now().isoformat()}).eq("invoice_id", invoice_id).execute()
+
+        message = f""" Accountant Chris
+        The invoice for {lead_name} from {company_name} has been sent successfully
+        Invoice ID: {invoice_id}
+        Invoice URL: {invoice_url}
+        Due Date: {due_date}
+
+        Please check your email, and review the invoice
+        """
+
+        await slack_notification_tool.ainvoke({"channel": Invoices_Channel_ID, "text": message, "webhook_type": "invoice"})
     except Exception as e:
         logger.error(f"Error sending invoice: {str(e)}")
         return AgentState(error_message=f"Error sending invoice: {str(e)}")

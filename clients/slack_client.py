@@ -1,6 +1,6 @@
 from slack_sdk.web.async_client import AsyncWebClient
 from slack_sdk.errors import SlackApiError
-from config import Slack_Approval_Bot_Token, Slack_Proposal_Bot_Token, Slack_Contract_Bot_Token
+from config import Slack_Approval_Bot_Token, Slack_Proposal_Bot_Token, Slack_Contract_Bot_Token, Slack_Invoice_Bot_Token
 import logging
 
 logger = logging.getLogger(__name__)
@@ -52,6 +52,19 @@ class SlackProposalClient:
 class SlackContractClient:
     def __init__(self):
         self.client = AsyncWebClient(token=Slack_Contract_Bot_Token)
+    
+    async def send_message(self, channel: str, text: str) -> dict:
+        """Send a simple message to a channel"""
+        try:
+            result = await self.client.chat_postMessage(channel=channel, text=text)
+            return result
+        except SlackApiError as e:
+            logger.error(f"Slack error: {e}")
+            raise
+
+class SlackInvoiceClient:
+    def __init__(self):
+        self.client = AsyncWebClient(token=Slack_Invoice_Bot_Token)
     
     async def send_message(self, channel: str, text: str) -> dict:
         """Send a simple message to a channel"""

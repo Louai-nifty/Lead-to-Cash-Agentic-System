@@ -1,4 +1,4 @@
-from clients.slack_client import SlackProposalClient, SlackApprovalClient, SlackContractClient
+from clients.slack_client import SlackProposalClient, SlackApprovalClient, SlackContractClient, SlackInvoiceClient
 from langchain_core.tools import tool
 from utils.loggings import get_logger
 from typing import Optional
@@ -6,6 +6,7 @@ from typing import Optional
 approvalclient = SlackApprovalClient()
 proposalclient = SlackProposalClient()
 contractclient = SlackContractClient()
+invoiceclient  = SlackInvoiceClient()
 logger = get_logger(__name__)
 
 @tool
@@ -19,6 +20,8 @@ async def slack_notification_tool(channel: str, text: str, webhook_type: str, bl
           await approvalclient.send_message(channel, text)
         elif webhook_type == "contract":
           await contractclient.send_message(channel, text)
+        elif webhook_type == "invoice":
+          await invoiceclient.send_message(channel, text)
 
       else:
         if webhook_type == "proposal":
