@@ -82,15 +82,16 @@ async def payment_node(state: AgentState):
         invoice_url = invoice["links"][0]["href"]
         due_date = invoice["detail"]["payment_term"]["due_date"]
 
-        logger.info(f"The invoice draft has been created : {invoice_id}")
+        logger.info(f"The invoice draft has been created, ID: {invoice_id}")
+        logger.info(f"The invoice URL: {invoice_url}")
                 
-        sup_client.table("invoices").insert({"invoice_id": invoice_id,"lead_id": lead_id, "amount": deal_size, "currency": "USD","status": "draft", "url": invoice_url, "due_date": due_date,"created_at": datetime.now().isoformat()}).eq("lead_id", lead_id).execute()
+        sup_client.table("invoices").insert({"invoice_id": invoice_id,"lead_id": lead_id, "amount": deal_size, "currency": "USD", "status": "draft", "url": invoice_url, "due_date": due_date, "created_at": datetime.now().isoformat()}).execute()
 
         return state
     except Exception as e:
         logger.error(f"Error creating invoice: {str(e)}")
         return AgentState(error_message=f"Error creating invoice: {str(e)}")
-"""
+
     try:
         await send_invoice.ainvoke({
                 "invoice_id": invoice_id,
@@ -106,4 +107,4 @@ async def payment_node(state: AgentState):
         sup_client.table("invoices").update({"status": "sent", "updated_at": datetime.now().isoformat()}).eq("invoice_id", invoice_id).execute()
     except Exception as e:
         logger.error(f"Error sending invoice: {str(e)}")
-        return AgentState(error_message=f"Error sending invoice: {str(e)}")"""
+        return AgentState(error_message=f"Error sending invoice: {str(e)}")
