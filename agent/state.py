@@ -38,4 +38,8 @@ class AgentState(BaseModel):
     company_name: Optional[str] = None
     status: Optional[str] = None
 
+
+    invoice_id: Optional[str] = None
+    invoice_url: Optional[str] = None
+
     error_message: Optional[str] = None
