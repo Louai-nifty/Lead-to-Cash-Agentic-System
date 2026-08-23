@@ -92,7 +92,6 @@ async def payment_node(state: AgentState):
         state.invoice_url = invoice_url
         state.invoice_status = "draft"
 
-        return state
     except Exception as e:
         logger.error(f"Error creating invoice: {str(e)}")
         return AgentState(error_message=f"Error creating invoice: {str(e)}")
