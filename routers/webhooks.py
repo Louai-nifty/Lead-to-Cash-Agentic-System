@@ -357,34 +357,35 @@ async def opensign_webhook(request: Request, background_tasks: BackgroundTasks):
 async def paypal_payment_webhook(request: Request):
     try:
         data = await request.json()
-
         logger.info(f"the data of paypal: {data}")
 
-        invoice_id = data["resource"]["id"]
         event_type = data["event_type"]
-        event_time = data["resource"]["payments"][0]["date"]
-        amount = data["resource"]["total_amount"]["value"]
-        link = data["resource"]["links"][0]["href"]
-        
-
-        lead_id = sup_client.table("invoices").select("lead_id").eq("invoice_id", invoice_id).execute().data[0]["lead_id"]
-
-        lead_data=sup_client.table("Leads").select("lead_name, company_name").eq("lead_id", lead_id).execute().data[0]
-        
-        lead_name = lead_data["lead_name"]
-        company_name = lead_data["company_name"]
-
 
         if event_type == "INVOICING.INVOICE.CREATED":
+            invoice_id= data["resource"]["invoice"]["id"]
+            
             logger.info(f"Invoice {invoice_id} has been created")
 
+        
         elif event_type == "INVOICING.INVOICE.PAID":
+            invoice_id = data["resource"]["invoice"]["id"]
+            event_time = data["resource"]["payments"][0]["date"]
+            amount = data["resource"]["total_amount"]["value"]
+            link = data["resource"]["links"][0]["href"]
+
             logger.info(f"Invoice {invoice_id} has been paid at: {event_time}")
 
             sup_client.table("payments").insert({"invoice_id": invoice_id, "lead_id": lead_id, "amount" : amount, "paid_at": event_time}).execute()
 
             sup_client.table("invoices").update({"status": "paid", "updated_at": event_time}).eq("invoice_id", invoice_id).execute()
 
+            lead_id = sup_client.table("invoices").select("lead_id").eq("invoice_id", invoice_id).execute().data[0]["lead_id"]
+
+            lead_data=sup_client.table("Leads").select("lead_name, company").eq("lead_id", lead_id).execute().data[0]
+            
+            lead_name = lead_data["lead_name"]
+            company_name = lead_data["company"]
+            
             message = f""" Another Win for Nexgen LLC. 
             client {lead_name} from {company_name} has paid the invoice
             It was paid at {event_time}
@@ -400,7 +401,15 @@ async def paypal_payment_webhook(request: Request):
             logger.info("The client onboarding process has started....................")
         
         elif event_type == "INVOICING.INVOICE.CANCELLED":
+            invoice_id = data["resource"]["invoice"]["id"]
             logger.info(f"Invoice {invoice_id} has been cancelled")
+
+            lead_id = sup_client.table("invoices").select("lead_id").eq("invoice_id", invoice_id).execute().data[0]["lead_id"]
+
+            lead_data=sup_client.table("Leads").select("lead_name, company").eq("lead_id", lead_id).execute().data[0]
+            
+            lead_name = lead_data["lead_name"]
+            company_name = lead_data["company"]
 
             updated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
 
@@ -413,7 +422,15 @@ async def paypal_payment_webhook(request: Request):
             await slack_notification_tool.ainvoke({"channel": Payments_Channel_ID, "text": message, "webhook_type": "invoice"})
         
         elif event_type == "INVOICING.INVOICE.REFUNDED":
+            invoice_id = data["resource"]["invoice"]["id"]
             logger.info(f"Invoice {invoice_id} has been refunded")
+
+            lead_id = sup_client.table("invoices").select("lead_id").eq("invoice_id", invoice_id).execute().data[0]["lead_id"]
+
+            lead_data=sup_client.table("Leads").select("lead_name, company").eq("lead_id", lead_id).execute().data[0]
+            
+            lead_name = lead_data["lead_name"]
+            company_name = lead_data["company"]
 
             updated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
 
@@ -424,7 +441,9 @@ async def paypal_payment_webhook(request: Request):
             """
 
             await slack_notification_tool.ainvoke({"channel": Payments_Channel_ID, "text": message, "webhook_type": "invoice"})
-            
+
+        
+    
     except Exception as e:
         logger.error(f"Error processing PayPal payment webhook: {str(e)}", exc_info=True)
         return AgentState(error_message=f"Error processing PayPal payment webhook: {str(e)}") 
