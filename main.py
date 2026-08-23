@@ -7,6 +7,7 @@ import asyncio
 from utils.loggings import get_logger
 from utils.paypal_auth import get_paypal_access_token
 import config
+import os
 
 logger = get_logger(__name__)
 
@@ -31,7 +32,9 @@ async def lifespan(app: FastAPI):
                 logger.error(f"Failed to renew PayPal token: {e}")
 
     renewal_task = asyncio.create_task(renew_token_loop())
-    async with AsyncSqliteSaver.from_conn_string("checkpoints.db") as checkpointer:
+    os.makedirs("checkpoints_data", exist_ok=True)
+    
+    async with AsyncSqliteSaver.from_conn_string("checkpoints_data/checkpoints.db") as checkpointer:
         app.state.agent = graph.compile(
             checkpointer=checkpointer,
             interrupt_before=["approval_handler"],
