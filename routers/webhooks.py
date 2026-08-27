@@ -380,6 +380,8 @@ async def paypal_payment_webhook(request: Request):
             sup_client.table("invoices").update({"status": "paid", "updated_at": event_time}).eq("invoice_id", invoice_id).execute()
 
             lead_id = sup_client.table("invoices").select("lead_id").eq("invoice_id", invoice_id).execute().data[0]["lead_id"]
+            
+            sup_client.table("Leads").update({"status": "client"}).eq("lead_id", lead_id).execute()
 
             lead_data=sup_client.table("Leads").select("lead_name, company").eq("lead_id", lead_id).execute().data[0]
             
